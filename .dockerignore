@@ -1,0 +1,6 @@
+__pycache__
+*.pyc
+zeero_env/
+db.sqlite3
+.idea
+staticfiles/
