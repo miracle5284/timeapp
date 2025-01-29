@@ -108,6 +108,7 @@ function startTimer(duration) {
       active = false;
       toggleFieldStates(false); // Re-enable editing and buttons
       controlBtn.textContent = 'Start';
+      updateButtonStates();
     }
   }, 1000);
 }
