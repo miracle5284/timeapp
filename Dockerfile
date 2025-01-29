@@ -14,9 +14,5 @@ COPY requirements.txt /app
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . /app/
-RUN python manage.py collectstatic --noinput
+RUN python manage.py collectstatic --noinput && python manage.py makemigrations && python manage.py migrate
 
-EXPOSE 8000
-
-RUN adduser -D myuser
-USER myuser
