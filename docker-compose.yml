@@ -2,7 +2,7 @@ version: '3.4'
 
 services:
   timer-app:
-    image: timer-app:v1
+    image: timer-app:latest
     build:
       context: .
       dockerfile: ./Dockerfile
