@@ -1,7 +1,7 @@
 name: Build and deploy Time App to an Azure Web App
 
 env:
-  AZURE_WEBAPP_NAME: time-app-slim
+  AZURE_WEBAPP_NAME: timer-app-slim
 
 on:
   push:
