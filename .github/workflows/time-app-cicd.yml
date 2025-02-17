@@ -37,19 +37,13 @@ jobs:
   build:
     runs-on: ubuntu-latest
     needs: prepare
-    environment: ${{ needs.prepare.outputs.ENVIRONMENT }}
-    outputs:
-      IMAGE: ${{ steps.set-image-name.outputs.IMAGE_NAME }}
+    environment:
+      name: ${{ needs.prepare.outputs.ENVIRONMENT }}
+
     steps:
 
-      - name: Setting Image name and tag from the Repo
-        id: set-image-name
-        run: echo "IMAGE_NAME=${{ vars.REGISTRY_LOGIN_SERVER }}/${GITHUB_REPOSITORY,,}:latest" >> $GITHUB_OUTPUT
-          
-
-      - name: Get Env Variables
-        run: |
-          echo "Image Name: ${{ steps.set-image-name.outputs.IMAGE_NAME }}"
+      - name: Lowercase the repo name and username
+        run: echo "REPO=${GITHUB_REPOSITORY,,}" >>${GITHUB_ENV}
 
       - uses: actions/checkout@v4
 
@@ -67,7 +61,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           push: true
-          tags: ${{ steps.set-image-name.outputs.IMAGE_NAME }}
+          tags: ${{ vars.REGISTRY_LOGIN_SERVER }}/${{ env.REPO }}:latest
           file: ./Dockerfile
 
   deploy:
@@ -75,20 +69,14 @@ jobs:
       contents: none
     runs-on: ubuntu-latest
     needs: [prepare, build]
-    environment: ${{ needs.prepare.outputs.ENVIRONMENT }}
-    env:
-      image: ${{ needs.build.outputs.IMAGE }}
+    environment:
+      name: ${{ needs.prepare.outputs.ENVIRONMENT }}
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
     steps:
-      - name: Get Env Variables
-        run: |
-          echo "Environment: ${{ needs.prepare.outputs.ENVIRONMENT }}"
-          
 
-      - name: Get Env Variables 2
-        run: |
-          echo "Image Name: ${{ needs.build.outputs.IMAGE }}"
-          echo "Image: ${{ env.image }}"
+      - name: Lowercase the repo name and username
+        run: echo "REPO=${GITHUB_REPOSITORY,,}" >>${GITHUB_ENV}
 
       - name: Azure Login
         uses: Azure/login@v2.2.0
@@ -99,4 +87,4 @@ jobs:
         uses: azure/webapps-deploy@v2
         with:
           app-name: ${{ vars.APP_NAME }}
-          images: ${{ needs.build.outputs.IMAGE_NAME }}
+          images: ${{ vars.REGISTRY_LOGIN_SERVER }}/${{ env.REPO }}:latest
