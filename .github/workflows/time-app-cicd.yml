@@ -15,7 +15,6 @@ jobs:
     outputs:
       ENVIRONMENT: ${{ steps.set-env.outputs.ENVIRONMENT }}
       IMAGE: ${{ steps.set-image-name.outputs.IMAGE }}
-    environment: ${{ steps.set-env.outputs.ENVIRONMENT }}
     steps:
       - name: Determine Environment
         id: set-env
@@ -42,6 +41,8 @@ jobs:
       - name: Get Env Variables
         run: |
           echo "Environment: ${{ steps.set-env.outputs.ENVIRONMENT }}, Image Name: ${{ steps.set-image-name.outputs.IMAGE }}"
+
+    environment: ${{ steps.set-env.outputs.ENVIRONMENT }}
   build:
     runs-on: ubuntu-latest
     needs: prepare
