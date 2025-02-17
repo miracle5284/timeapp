@@ -75,6 +75,9 @@ jobs:
     environment: ${{ needs.prepare.outputs.ENVIRONMENT }}
 
     steps:
+      - name: Get Env Variables
+        run: |
+          echo "Environment: ${{ needs.prepare.outputs.ENVIRONMENT }}"
 
       - name: Azure Login
         uses: Azure/login@v2.2.0
