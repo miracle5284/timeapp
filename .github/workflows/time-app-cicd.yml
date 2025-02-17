@@ -15,6 +15,7 @@ jobs:
     outputs:
       ENVIRONMENT: ${{ steps.set-env.outputs.ENVIRONMENT }}
       IMAGE: ${{ steps.set-image-name.outputs.IMAGE }}
+    environment: ${{ steps.set-env.outputs.ENVIRONMENT }}
     steps:
       - name: Determine Environment
         id: set-env
@@ -36,7 +37,7 @@ jobs:
         id: set-image-name
         run: |
           echo "REPO=${GITHUB_REPOSITORY,,}" >>${GITHUB_ENV}
-          echo "IMAGE=${{ vars.REGISTRY_LOGIN_SERVER }}/${{ env.REPO }}:latest" >> GITHUB_OUTPUT
+          echo "IMAGE=${{ vars.REGISTRY_LOGIN_SERVER }}/${{ env.REPO }}:latest" >> ${GITHUB_OUTPUT}
 
       - name: Get Env Variables
         run: |
