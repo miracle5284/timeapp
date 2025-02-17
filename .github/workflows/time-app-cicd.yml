@@ -38,16 +38,18 @@ jobs:
     runs-on: ubuntu-latest
     needs: prepare
     environment: ${{ needs.prepare.outputs.ENVIRONMENT }}
+    outputs:
+      IMAGE_NAME: ${{ steps.set-image-name.outputs.IMAGE_NAME }}
     steps:
 
       - name: Setting Image name and tag from the Repo
-        run: |
-          echo "IMAGE_NAME=${{ vars.REGISTRY_LOGIN_SERVER }}/${GITHUB_REPOSITORY,,}:latest" >> ${GITHUB_ENV}
+        id: set-image-name
+        run: echo "IMAGE_NAME=${{ vars.REGISTRY_LOGIN_SERVER }}/${GITHUB_REPOSITORY,,}:latest" >> $GITHUB_OUTPUT
           
 
       - name: Get Env Variables
         run: |
-          echo "Image Name: ${{ env.IMAGE_NAME }}"
+          echo "Image Name: ${{ steps.set-image-name.outputs.IMAGE_NAME }}"
 
       - uses: actions/checkout@v4
 
@@ -65,7 +67,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           push: true
-          tags: ${{ env.IMAGE_NAME }}
+          tags: ${{ steps.set-image-name.outputs.IMAGE_NAME }}
           file: ./Dockerfile
 
   deploy:
@@ -83,7 +85,7 @@ jobs:
 
       - name: Get Env Variables 2
         run: |
-          echo "Environment: ${{ env.IMAGE_NAME }}"
+          echo "Image Name: ${{ needs.build.outputs.IMAGE_NAME }}"
 
       - name: Azure Login
         uses: Azure/login@v2.2.0
@@ -94,4 +96,4 @@ jobs:
         uses: azure/webapps-deploy@v2
         with:
           app-name: ${{ vars.APP_NAME }}
-          images: ${{ env.IMAGE_NAME }}
+          images: ${{ needs.build.outputs.IMAGE_NAME }}
