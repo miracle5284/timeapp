@@ -2,7 +2,9 @@ name: Build and deploy Time App
 
 on:
   push:
-    branches: [ "develop", "staging", "master" ]
+    branches: [ "develop", "staging"]
+    tags: [ "*"]
+
   workflow_dispatch:
 
 permissions:
