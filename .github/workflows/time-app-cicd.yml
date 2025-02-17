@@ -63,7 +63,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           push: true
-          tags: ${{ vars.REGISTRY_LOGIN_SERVER }}/${{ env.REPO }}:latest
+          tags: ${{ vars.REGISTRY_LOGIN_SERVER }}/${{ env.REPO }}-${{ needs.prepare.outputs.ENVIRONMENT }}:latest
           file: ./Dockerfile
 
   deploy:
@@ -89,4 +89,4 @@ jobs:
         uses: azure/webapps-deploy@v2
         with:
           app-name: ${{ vars.APP_NAME }}
-          images: ${{ vars.REGISTRY_LOGIN_SERVER }}/${{ env.REPO }}:latest
+          images: ${{ vars.REGISTRY_LOGIN_SERVER }}/${{ env.REPO }}-${{ needs.prepare.outputs.ENVIRONMENT }}:latest
