@@ -16,7 +16,7 @@ jobs:
       ENVIRONMENT: ${{ steps.set-env.outputs.ENVIRONMENT }}
       APP_NAME: ${{ steps.set-env.outputs.APP_NAME }}
     steps:
-      - name: Determine Environment
+      - name: Preparing...
         id: set-env
         run: |
           BRANCH_NAME="${GITHUB_REF##*/}"
@@ -30,6 +30,7 @@ jobs:
           else
             # Default or fallback
             echo "ENVIRONMENT=unknown" >> $GITHUB_OUTPUT
+          fi
 
       - name: Get Env Variables
         run: |
