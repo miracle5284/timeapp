@@ -69,7 +69,7 @@ function updateDisplay(notifyChange = false) {
 // Start or pause the timer
 function toggleTimer() {
   if (active) {
-    axios.put('/timer/pause_timer', { duration }, getHeaders())
+    axios.put('/pause_timer', { duration }, getHeaders())
       .then(() => {
         clearInterval(countdownInterval);
         controlBtn.textContent = 'Start';
@@ -84,7 +84,7 @@ function toggleTimer() {
     initialDuration = duration;
     valueChanged = false;
   }
-  axios.post('/timer/set_timer', { duration, initialDuration }, getHeaders())
+  axios.post('/set_timer', { duration, initialDuration }, getHeaders())
     .then(() => {
       startTimer(duration);
       active = true; // Update the active state
@@ -115,7 +115,7 @@ function startTimer(duration) {
 
 // Reset timer to the initial state
 function resetTimer() {
-  axios.put('/timer/reset_timer', {}, getHeaders())
+  axios.put('/reset_timer', {}, getHeaders())
     .then(() => {
       clearInterval(countdownInterval);
       renderTimer(initialDuration);
