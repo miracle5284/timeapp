@@ -12,6 +12,7 @@ let duration = null;
 let timerRunning = false;
 let timeUpWrapper = null;
 let csrfToken = null;
+const timeUpSound = new Audio(AUDIO_URL);
 
 // Initialize variables and setup event listeners
 document.addEventListener('DOMContentLoaded', () => {
@@ -42,6 +43,12 @@ document.addEventListener('DOMContentLoaded', () => {
     timeUpWrapper.textContent = 'Time Up!!!';
   }
 });
+
+function playTimeUpSound() {
+  timeUpSound.play().catch(error => {
+    console.error('Error playing audio:', error);
+  });
+}
 
 // Calculate the total duration in seconds
 function calculateDuration() {
@@ -105,6 +112,7 @@ function startTimer(duration) {
     if (duration <= 0) {
       clearInterval(countdownInterval);
       timeUpWrapper.textContent = 'Time Up!!!';
+      playTimeUpSound();
       active = false;
       toggleFieldStates(false); // Re-enable editing and buttons
       controlBtn.textContent = 'Start';
