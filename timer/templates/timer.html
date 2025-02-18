@@ -11,6 +11,11 @@
     <link href="{% static '/styles/style.css' %}" rel="stylesheet">
       <link rel="icon" type="image/svg+xml" href="{% static 'imgs/clock-circle-svgrepo-com.svg' %}">
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js" defer></script>
+
+      <!-- Load global variables -->
+      <script>
+        var AUDIO_URL = "{% static '/audio/clock-alarm-8761.mp3' %}";
+      </script>
     <script src="{% static 'js/timer.js' %}" defer></script>
   </head>
   <body>
