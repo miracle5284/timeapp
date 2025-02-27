@@ -123,7 +123,7 @@ def reset_timer(request):
 
         # Reset only if an initial duration exists
         if initial_duration <= 0:
-            return JsonResponse({'error': 'No timer has been set'}, status=400)
+            return JsonResponse({'error': 'No timer has been set'}, status=428)
 
         request.session['duration'] = initial_duration
         request.session['start_time'] = None
