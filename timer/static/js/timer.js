@@ -173,12 +173,19 @@ function addValidators() {
   const editableSpans = document.querySelectorAll('.display');
 
   editableSpans.forEach((el) => {
+
     el.addEventListener('keypress', (event) => {
+
       if (isNaN(event.key)) {
         event.preventDefault();
         showPopover(el, 'Only numbers are allowed!');
-      }
-    });
+      } else if (el.textContent === '00') {
+        event.preventDefault();
+        let position = getCursorPosition();
+        el.textContent = event.key.padEnd(3 - position, '0')
+        setCursorPosition(el,1)
+        }
+      });
 
     el.addEventListener('blur', () => {
       validateRange(el);
@@ -244,4 +251,28 @@ function getHeaders() {
       'Content-Type': 'application/json',
     },
   };
+}
+
+// Manipulating windows cursor position
+function getCursorPosition() {
+  const selection = window.getSelection();
+  return selection.anchorOffset
+}
+
+function setCursorPosition(el, index) {
+
+    const selection = window.getSelection();
+    const range = document.createRange();
+
+    let node = el.firstChild; // Get the text node
+    if (!node) return; // Prevent errors if the element is empty
+
+    let length = node.length;
+    if (index > length) index = length; // Avoid out-of-bounds errors
+
+    range.setStart(node, index);
+    range.collapse(true); // Collapse to ensure a single caret position
+
+    selection.removeAllRanges();
+    selection.addRange(range);
 }
