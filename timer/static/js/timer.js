@@ -79,7 +79,7 @@ function toggleTimer() {
     axios.put('/pause_timer', { duration }, getHeaders())
       .then(() => {
         clearInterval(countdownInterval);
-        controlBtn.textContent = 'Start';
+        updateControlButtonText('Start');
         active = false; // Update the active state
         toggleFieldStates(false); // Re-enable editing and buttons
       });
@@ -103,7 +103,7 @@ function toggleTimer() {
 function startTimer(duration) {
   renderTimer(duration);
   active = true;
-  controlBtn.textContent = 'Pause';
+  updateControlButtonText('Pause');
   timeUpWrapper.textContent = null;
   countdownInterval = setInterval(() => {
     duration--;
@@ -115,7 +115,7 @@ function startTimer(duration) {
       playTimeUpSound();
       active = false;
       toggleFieldStates(false); // Re-enable editing and buttons
-      controlBtn.textContent = 'Start';
+      updateControlButtonText('Start');
       updateButtonStates();
     }
   }, 1000);
@@ -130,7 +130,7 @@ function resetTimer() {
       active = false;
       toggleFieldStates(false); // Re-enable editing and buttons
       updateButtonStates();
-      controlBtn.textContent = 'Start';
+      updateControlButtonText('Start');
     });
 }
 
@@ -184,8 +184,8 @@ function addValidators() {
         let position = getCursorPosition();
         el.textContent = event.key.padEnd(3 - position, '0')
         setCursorPosition(el,1)
-        }
-      });
+      }
+    });
 
     el.addEventListener('blur', () => {
       validateRange(el);
@@ -256,23 +256,40 @@ function getHeaders() {
 // Manipulating windows cursor position
 function getCursorPosition() {
   const selection = window.getSelection();
-  return selection.anchorOffset
+  return selection.anchorOffset;
 }
 
 function setCursorPosition(el, index) {
+  const selection = window.getSelection();
+  const range = document.createRange();
 
-    const selection = window.getSelection();
-    const range = document.createRange();
+  let node = el.firstChild; // Get the text node
+  if (!node) return; // Prevent errors if the element is empty
 
-    let node = el.firstChild; // Get the text node
-    if (!node) return; // Prevent errors if the element is empty
+  let length = node.length;
+  if (index > length) index = length; // Avoid out-of-bounds errors
 
-    let length = node.length;
-    if (index > length) index = length; // Avoid out-of-bounds errors
+  range.setStart(node, index);
+  range.collapse(true); // Collapse to ensure a single caret position
 
-    range.setStart(node, index);
-    range.collapse(true); // Collapse to ensure a single caret position
+  selection.removeAllRanges();
+  selection.addRange(range);
+}
 
-    selection.removeAllRanges();
-    selection.addRange(range);
+
+// Helper function to fade out/in the control button text
+function updateControlButtonText(newText) {
+  const controlText = document.getElementById("control-text");
+  if (!controlText) {
+    // Fallback if span is missing
+    controlBtn.textContent = newText;
+    return;
+  }
+  controlText.classList.remove("fade-in");
+  controlText.classList.add("fade-out");
+  setTimeout(() => {
+    controlText.textContent = newText;
+    controlText.classList.remove("fade-out");
+    controlText.classList.add("fade-in");
+  }, 500); // Match the CSS transition duration
 }

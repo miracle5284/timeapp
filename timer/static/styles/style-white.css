@@ -1,0 +1,284 @@
+/* Base styles */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Open Sans', Arial, sans-serif;
+  overflow-x: hidden;
+}
+
+/* Title */
+h1 {
+  font-size: clamp(2rem, 4vw, 3rem);
+  margin-bottom: 20px;
+  font-weight: 500;
+  text-align: center;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Timer Container */
+.t-container {
+  width: 90%;
+  max-width: 600px;
+  min-width: 320px;
+  padding: clamp(20px, 5vw, 40px);
+  border-radius: 15px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Timer Display */
+.timer-face {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: clamp(20px, 5vw, 40px) 0;
+  flex-wrap: wrap;
+}
+
+.timer-display {
+  display: flex;
+  align-items: center;
+  gap: clamp(5px, 3vw, 20px);
+}
+
+/* Time Blocks */
+.display {
+  font-size: clamp(2rem, 6vw, 5rem);
+  font-weight: 500;
+  padding: clamp(10px, 3vw, 15px) clamp(15px, 5vw, 30px);
+  border-radius: 10px;
+  text-align: center;
+  min-width: clamp(60px, 20vw, 100px);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Rounded Colon */
+.colon {
+  font-size: clamp(2rem, 6vw, 5rem);
+  font-weight: bold;
+  margin-top: clamp(5px, 1vw, 10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  transform: translateY(20%);
+  font-family: "Poppins", "Arial Rounded MT Bold", "Helvetica Rounded", Arial, sans-serif;
+}
+
+/* Buttons and Labels */
+.label {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: clamp(10px, 3vw, 30px);
+}
+
+.label-text {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.btn-icon {
+  all: unset;
+  cursor: pointer;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: clamp(25px, 5vw, 30px);
+  height: clamp(25px, 5vw, 30px);
+}
+
+.btn-icon img {
+  width: 100%;
+  height: auto;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.btn-icon img:hover {
+  transform: scale(1.2);
+  opacity: 0.9;
+}
+
+.btn-icon:disabled {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+/* Control Buttons */
+.controls {
+  margin-top: clamp(10px, 3vw, 30px);
+  display: flex;
+  justify-content: center;
+  gap: clamp(10px, 3vw, 15px);
+}
+
+.ctrl-btn {
+  color: white;
+  font-size: clamp(0.9rem, 1.5vw, 1.3rem);
+  padding: clamp(10px, 2vw, 15px) clamp(15px, 5vw, 30px);
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: clamp(80px, 20vw, 120px);
+    background-color: #d0d0d0;
+}
+
+.ctrl-btn:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+/* Time-Up Notification */
+.time-up {
+  margin-top: 15px;
+  font-size: clamp(1.2rem, 2vw, 1.8rem);
+  font-weight: bold;
+}
+
+/* Custom Popover */
+.custom-popover {
+  position: absolute;
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: clamp(0.8rem, 1vw, 1rem);
+  white-space: nowrap;
+  z-index: 1000;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  transform: translate(-50%, -100%);
+}
+
+/* Responsive Design Adjustments */
+@media (max-width: 768px) {
+  .t-container {
+    width: 95%;
+    padding: clamp(15px, 4vw, 25px);
+  }
+
+  .timer-face {
+    margin: 20px 0;
+  }
+
+  .timer-display {
+    gap: 5px;
+  }
+
+  .display {
+    font-size: clamp(1.8rem, 5vw, 4rem);
+    padding: 10px 15px;
+    min-width: 60px;
+  }
+
+  .colon {
+    font-size: clamp(1.8rem, 5vw, 4rem);
+  }
+
+  .ctrl-btn {
+    padding: 10px 15px;
+    min-width: 90px;
+  }
+}
+
+@media (max-width: 480px) {
+  h1 {
+    font-size: 1.8rem;
+  }
+
+  .t-container {
+    width: 98%;
+    padding: clamp(10px, 4vw, 20px);
+    border-radius: 10px;
+  }
+
+  .timer-face {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .timer-display {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .display {
+    font-size: 2.5rem;
+    min-width: 70px;
+  }
+
+  .colon {
+    font-size: 2.5rem;
+  }
+
+  .ctrl-btn {
+    padding: 10px 12px;
+    font-size: 1rem;
+  }
+}
+
+/* Theme 1: Light Theme */
+.theme-light {
+  --background-color: #ffffff;
+  --text-color: #000000;
+  --primary-color: #007bff;
+}
+
+.theme-light body {
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+.theme-light .t-container {
+  background: var(--background-color);
+}
+
+.theme-light .ctrl-btn {
+  background: var(--primary-color);
+}
+
+/* Theme 2: Dark Theme */
+.theme-dark {
+  --background-color: #333333;
+  --text-color: #ffffff;
+  --primary-color: #ff5722;
+}
+
+.theme-dark body {
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+.theme-dark .t-container {
+  background: var(--background-color);
+}
+
+.theme-dark .ctrl-btn {
+  background: var(--primary-color);
+}
+
+/* Theme 3: Blue Theme */
+.theme-blue {
+  --background-color: #e0f7fa;
+  --text-color: #006064;
+  --primary-color: #00acc1;
+}
+
+.theme-blue body {
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+.theme-blue .t-container {
+  background: var(--background-color);
+}
+
+.theme-blue .ctrl-btn {
+  background: var(--primary-color);
+}

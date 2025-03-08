@@ -2,8 +2,10 @@ from datetime import datetime
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
+from .utils import calculate_elapsed_time
 import json
 import logging
+import random
 
 # Initialize logger for debugging
 logging.basicConfig(level=logging.INFO)
@@ -15,6 +17,8 @@ def ensure_session(request):
         request.session.create()
 
 # Home View: Renders the timer with stored session data
+
+STYLES = ['animate-styling.css', 'style.css', 'style-cool.css', 'style-white.css']
 def home(request):
     ensure_session(request)
 
@@ -25,15 +29,19 @@ def home(request):
         start_time = request.session.get('start_time')
         time_up = False
 
+        # Check if a style is already stored in session
+        style = request.session.get('selected_style')
+
+        if not style or calculate_elapsed_time(style.get('start_time')) > 3600:
+            # If not, select a random style and store it in session
+            request.session['selected_style'] = style = {
+                'style': random.choice(STYLES),
+                'start_time': datetime.now().isoformat()
+            }
+
         if duration > 0 and start_time:
             try:
-                start_time_dt = datetime.fromisoformat(start_time)
-
-                if pause_time:
-                    pause_time_dt = datetime.fromisoformat(pause_time)
-                    duration -= (pause_time_dt - start_time_dt).total_seconds()
-                else:
-                    duration -= (datetime.now() - start_time_dt).total_seconds()
+                duration -= calculate_elapsed_time(start_time, pause_time)
 
                 if duration <= 0:
                     duration = 0
@@ -52,7 +60,8 @@ def home(request):
             "time_maps": {'Hours': int(hour), 'Minutes': int(minutes), 'Seconds': int(seconds)},
             'time_up': time_up,
             'initial_duration': initial_duration,
-            "active": bool(not pause_time and start_time and duration)
+            "active": bool(not pause_time and start_time and duration),
+            'style': style.get('style')
         })
 
     except Exception as e:
