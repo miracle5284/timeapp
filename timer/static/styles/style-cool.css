@@ -1,0 +1,249 @@
+/* Base styles */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Roboto', Arial, sans-serif;
+  overflow-x: hidden;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+/* Title */
+h1 {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  color: #333;
+  margin-bottom: 25px;
+  font-weight: 700;
+  text-align: center;
+  font-family: "Montserrat", Arial, sans-serif;
+}
+
+/* Timer Container */
+.t-container {
+  width: 85%;
+  max-width: 650px;
+  min-width: 300px;
+  padding: clamp(25px, 6vw, 50px);
+  background: #fefefe;
+  border-radius: 20px;
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Top bar design */
+.t-container:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 10px;
+  background: linear-gradient(to right, #ff6f61, #de6262);
+}
+
+/* Timer Display */
+.timer-face {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: clamp(25px, 6vw, 50px) 0;
+  flex-wrap: wrap;
+}
+
+.timer-display {
+  display: flex;
+  align-items: center;
+  gap: clamp(10px, 4vw, 25px);
+}
+
+/* Time Blocks */
+.display {
+  font-size: clamp(2.5rem, 7vw, 6rem);
+  font-weight: 600;
+  background-color: #444;
+  color: #fff;
+  padding: clamp(15px, 4vw, 20px) clamp(20px, 6vw, 35px);
+  border-radius: 12px;
+  text-align: center;
+  min-width: clamp(70px, 25vw, 120px);
+  box-shadow: 0 7px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Rounded Colon */
+.colon {
+  font-size: clamp(2.5rem, 7vw, 6rem);
+  font-weight: bold;
+  color: #555;
+  margin-top: clamp(10px, 2vw, 15px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  transform: translateY(25%);
+  font-family: "Poppins", "Arial Rounded MT Bold", "Helvetica Rounded", Arial, sans-serif;
+}
+
+/* Buttons and Labels */
+.label {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: clamp(15px, 4vw, 35px);
+}
+
+.label-text {
+  font-size: 1.2rem;
+  color: #666;
+  font-weight: 700;
+}
+
+.btn-icon {
+  all: unset;
+  cursor: pointer;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: clamp(30px, 6vw, 35px);
+  height: clamp(30px, 6vw, 35px);
+}
+
+.btn-icon img {
+  width: 100%;
+  height: auto;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.btn-icon img:hover {
+  transform: scale(1.3);
+  opacity: 0.8;
+}
+
+.btn-icon:disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+/* Control Buttons */
+.controls {
+  margin-top: clamp(15px, 4vw, 35px);
+  display: flex;
+  justify-content: center;
+  gap: clamp(15px, 4vw, 20px);
+}
+
+.ctrl-btn {
+  background: linear-gradient(to right, #ff6f61, #de6262);
+  color: white;
+  font-size: clamp(1rem, 2vw, 1.5rem);
+  padding: clamp(15px, 3vw, 20px) clamp(20px, 6vw, 35px);
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: clamp(90px, 25vw, 130px);
+}
+
+.ctrl-btn:hover {
+  background: linear-gradient(to right, #e55d50, #c54b4b);
+}
+
+.ctrl-btn:disabled {
+  background-color: #ddd;
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Time-Up Notification */
+.time-up {
+  margin-top: 20px;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  color: #e74c3c;
+  font-weight: bold;
+}
+
+/* Custom Popover */
+.custom-popover {
+  position: absolute;
+  background: #555;
+  color: #fff;
+  padding: 10px 15px;
+  border-radius: 8px;
+  font-size: clamp(0.9rem, 1.2vw, 1.2rem);
+  white-space: nowrap;
+  z-index: 1000;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+  transform: translate(-50%, -100%);
+}
+
+/* Responsive Design Adjustments */
+@media (max-width: 768px) {
+  .t-container {
+    width: 90%;
+    padding: clamp(20px, 5vw, 30px);
+  }
+
+  .timer-face {
+    margin: 25px 0;
+  }
+
+  .timer-display {
+    gap: 10px;
+  }
+
+  .display {
+    font-size: clamp(2.2rem, 6vw, 5.5rem);
+    padding: 15px 20px;
+    min-width: 70px;
+  }
+
+  .colon {
+    font-size: clamp(2.2rem, 6vw, 5.5rem);
+  }
+
+  .ctrl-btn {
+    padding: 15px 20px;
+    min-width: 100px;
+  }
+}
+
+@media (max-width: 480px) {
+  h1 {
+    font-size: 2.2rem;
+  }
+
+  .t-container {
+    width: 95%;
+    padding: clamp(15px, 5vw, 25px);
+    border-radius: 15px;
+  }
+
+  .timer-face {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .timer-display {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .display {
+    font-size: 3rem;
+    min-width: 80px;
+  }
+
+  .colon {
+    font-size: 3rem;
+  }
+
+  .ctrl-btn {
+    padding: 15px 18px;
+    font-size: 1.2rem;
+  }
+}

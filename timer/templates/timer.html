@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Countdown Timer">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-    <link href="{% static '/styles/style.css' %}" rel="stylesheet">
+    <link href="{% static '/styles/'|add:style %}" rel="stylesheet">
       <link rel="icon" type="image/svg+xml" href="{% static 'imgs/clock-circle-svgrepo-com.svg' %}">
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js" defer></script>
 
@@ -59,7 +59,10 @@
         </div>
       </div>
       <div class="controls">
-        <button id="control" class="ctrl-btn" onclick="toggleTimer()">Start</button>
+        <button id="control" class="ctrl-btn" onclick="toggleTimer()">
+          <span id="control-text" class="fade-in">Start</span>
+        </button>
+
         <button id="reset" class="ctrl-btn" onclick="resetTimer()">Reset</button>
       </div>
       <div class="time-up" id="time-up-wrap">
