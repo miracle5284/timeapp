@@ -1,5 +1,5 @@
 let active = false;
-let countdownInterval = null;
+let countdownWorker = null;
 let hourEl = null;
 let minuteEl = null;
 let secondEl = null;
@@ -12,10 +12,18 @@ let duration = null;
 let timerRunning = false;
 let timeUpWrapper = null;
 let csrfToken = null;
+let notificationPermission = false;
 const timeUpSound = new Audio(AUDIO_URL);
 
 // Initialize variables and setup event listeners
 document.addEventListener('DOMContentLoaded', () => {
+  // Request notification permission
+  if ('Notification' in window) {
+    Notification.requestPermission().then(function(permission) {
+      notificationPermission = permission === 'granted';
+    });
+  }
+
   hourEl = document.getElementById('hours-display');
   minuteEl = document.getElementById('minutes-display');
   secondEl = document.getElementById('seconds-display');
@@ -44,11 +52,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-function playTimeUpSound() {
-  timeUpSound.play().catch(error => {
-    console.error('Error playing audio:', error);
-  });
-}
 
 // Calculate the total duration in seconds
 function calculateDuration() {
@@ -61,7 +64,7 @@ function calculateDuration() {
 
 // Update the timer display based on duration
 function updateDisplay(notifyChange = false) {
-  timeUpWrapper.textContent = null;
+  timeUpWrapper.textContent = '';
   setTimeout(() => {
     duration = calculateDuration();
     renderTimer(duration);
@@ -78,7 +81,10 @@ function toggleTimer() {
   if (active) {
     axios.put('/pause_timer', { duration }, getHeaders())
       .then(() => {
-        clearInterval(countdownInterval);
+        if (countdownWorker) {
+          countdownWorker.terminate();
+          countdownWorker = null;
+        }
         updateControlButtonText('Start');
         active = false; // Update the active state
         toggleFieldStates(false); // Re-enable editing and buttons
@@ -86,7 +92,7 @@ function toggleTimer() {
     return;
   }
 
-  duration = calculateDuration();
+  calculateDuration();
   if (valueChanged) {
     initialDuration = duration;
     valueChanged = false;
@@ -104,29 +110,44 @@ function startTimer(duration) {
   renderTimer(duration);
   active = true;
   updateControlButtonText('Pause');
-  timeUpWrapper.textContent = null;
-  countdownInterval = setInterval(() => {
-    duration--;
-    renderTimer(duration);
+  timeUpWrapper.textContent = '';
 
-    if (duration <= 0) {
-      clearInterval(countdownInterval);
+  // Create a new worker from timerWorker.js
+  countdownWorker = new Worker('/static/js/timerWorker.js');
+  countdownWorker.postMessage({
+    type: 'start',
+    duration: duration,
+  });
+  resetBtn.disabled = false;
+
+  countdownWorker.onmessage = function(event) {
+    const remaining = event.data.remaining;
+    if (remaining <= 0) {
+      countdownWorker.terminate();
+      countdownWorker = null;
       timeUpWrapper.textContent = 'Time Up!!!';
-      playTimeUpSound();
+      calculateDuration();
       active = false;
       toggleFieldStates(false); // Re-enable editing and buttons
       updateControlButtonText('Start');
       updateButtonStates();
+      playAlarm();
+      sendNotification();
     }
-  }, 1000);
+    renderTimer(remaining);
+  };
 }
 
 // Reset timer to the initial state
 function resetTimer() {
   axios.put('/reset_timer', {}, getHeaders())
     .then(() => {
-      clearInterval(countdownInterval);
-      renderTimer(initialDuration);
+      if (countdownWorker) {
+        countdownWorker.terminate();
+        countdownWorker = null;
+      }
+      duration = initialDuration;
+      renderTimer(duration);
       active = false;
       toggleFieldStates(false); // Re-enable editing and buttons
       updateButtonStates();
@@ -143,7 +164,9 @@ function renderTimer(duration) {
   hourEl.textContent = String(hours).padStart(2, '0');
   minuteEl.textContent = String(minutes).padStart(2, '0');
   secondEl.textContent = String(seconds).padStart(2, '0');
-  controlBtn.disabled = duration <= 0;
+
+    controlBtn.disabled = duration <= 0;
+    resetBtn.disabled =  !(!!initialDuration);
 }
 
 // Adjust time by incrementing or decrementing
@@ -292,4 +315,29 @@ function updateControlButtonText(newText) {
     controlText.classList.remove("fade-out");
     controlText.classList.add("fade-in");
   }, 500); // Match the CSS transition duration
+}
+
+function playAlarm() {
+  timeUpSound.play().catch(error => {
+    console.error('Error playing audio:', error);
+  });
+}
+
+function sendNotification () {
+  if (notificationPermission) {
+    try {
+      new Notification('Timer Complete!', {
+        body: `Your timer of ${initialDuration} seconds has finished!`,
+        icon: '/static/imgs/clock-circle-svgrepo-com.svg',
+        requireInteraction: true  // Make notification persist until user interaction
+      });
+    } catch (e) {
+      console.warn('Notification failed:', e);
+    }
+  }
+
+  // Vibrate if supported
+  if ('vibrate' in navigator) {
+    navigator.vibrate([200, 100, 200]);
+  }
 }
