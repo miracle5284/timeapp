@@ -9,6 +9,7 @@
     <meta name="description" content="Countdown Timer">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <link href="{% static '/styles/'|add:style %}" rel="stylesheet">
+    <link href="{% static '/styles/_extension.css' %}" rel="stylesheet">
       <link rel="icon" type="image/svg+xml" href="{% static 'imgs/clock-circle-svgrepo-com.svg' %}">
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js" defer></script>
 
@@ -19,6 +20,13 @@
     <script src="{% static 'js/timer.js' %}" defer></script>
   </head>
   <body>
+
+    <div id="extensionPrompt">
+      For the best experience, please
+      <span id="installLink" style="display: none;"><a target="_blank">install</a> and activate </span><a target="_blank" id="enableLink" style="display: none;">activate</a>
+      <a id="enableLink" target="_blank" style="display: none;">activate</a> the Timer Keeper Active extension.
+    </div>
+
     <div class="t-container">
       <h1>Countdown Timer</h1>
       <div class="timer-face">
@@ -76,7 +84,10 @@
       type="hidden"
       data-initial="{{ initial_duration }}"
       data-active="{{ active }}"
+      data-extension-id="{{ EXTENSION_ID }}"
+      
     ></div>
     {% csrf_token %}
+    <script src="{% static 'js/_extension.js' %}" defer></script>
   </body>
 </html>

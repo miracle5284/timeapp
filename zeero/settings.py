@@ -33,6 +33,7 @@ PRODUCTION_SERVERs = os.environ.get('PRODUCTION_SERVERS')
 
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+EXTENSION_ID = os.environ.get('EXTENSION_ID')
 
 if PRODUCTION_SERVERs:
 

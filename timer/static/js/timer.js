@@ -78,7 +78,10 @@ function toggleTimer() {
   if (active) {
     axios.put('/pause_timer', { duration }, getHeaders())
       .then(() => {
-        clearInterval(countdownInterval);
+        if (countdownWorker) {
+          countdownWorker.terminate();
+          countdownWorker = null;
+        }
         updateControlButtonText('Start');
         active = false; // Update the active state
         toggleFieldStates(false); // Re-enable editing and buttons
@@ -109,8 +112,19 @@ function startTimer(duration) {
     duration--;
     renderTimer(duration);
 
-    if (duration <= 0) {
-      clearInterval(countdownInterval);
+  // Create a new worker from timerWorker.js
+  countdownWorker = new Worker('/static/js/timerWorker.js');
+  countdownWorker.postMessage({
+    type: 'start',
+    duration: duration,
+  });
+  resetBtn.disabled = false;
+
+  countdownWorker.onmessage = function(event) {
+    const remaining = event.data.remaining;
+    if (remaining <= 0) {
+      countdownWorker.terminate();
+      countdownWorker = null;
       timeUpWrapper.textContent = 'Time Up!!!';
       playTimeUpSound();
       active = false;
@@ -125,8 +139,12 @@ function startTimer(duration) {
 function resetTimer() {
   axios.put('/reset_timer', {}, getHeaders())
     .then(() => {
-      clearInterval(countdownInterval);
-      renderTimer(initialDuration);
+      if (countdownWorker) {
+        countdownWorker.terminate();
+        countdownWorker = null;
+      }
+      duration = initialDuration;
+      renderTimer(duration);
       active = false;
       toggleFieldStates(false); // Re-enable editing and buttons
       updateButtonStates();

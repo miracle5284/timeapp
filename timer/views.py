@@ -1,11 +1,14 @@
+import json
+import logging
+import random
+
 from datetime import datetime
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
+from django.conf import settings
 from .utils import calculate_elapsed_time
-import json
-import logging
-import random
+
 
 # Initialize logger for debugging
 logging.basicConfig(level=logging.INFO)
@@ -61,7 +64,8 @@ def home(request):
             'time_up': time_up,
             'initial_duration': initial_duration,
             "active": bool(not pause_time and start_time and duration),
-            'style': style.get('style')
+            'style': style.get('style'),
+            'EXTENSION_ID': settings.EXTENSION_ID
         })
 
     except Exception as e:
