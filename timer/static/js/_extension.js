@@ -176,7 +176,7 @@ function showExtensionWarning() {
           <li>Find <strong>Timer Keeper Active</strong>.</li>
           <li>Enable the extension.</li>
         </ol>
-        <p><a href="https://yourwebsite.com/extension-help" target="_blank">Need Help?</a></p>
+        <p><a href="https://github.com/miracle5284/timer-keeper-extension" target="_blank">Need Help?</a></p>
         <button onclick="document.getElementById('instruction-modal').style.display='none'">Close</button>
       </div>
     `;
