@@ -1,0 +1,245 @@
+/* style.css */
+
+/* Reset and basic styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #fad0c4, #ff9a9e);
+  background-size: 400% 400%;
+  animation: gradientAnimation 15s ease infinite;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Gradient background animation */
+@keyframes gradientAnimation {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Container styling */
+.t-container {
+  max-width: 600px;
+  max-height: 80vh;
+  overflow: auto;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 10px;
+  padding: 40px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  margin: 20px auto;
+  text-align: center;
+  animation: containerEntrance 1s ease-out;
+}
+
+/* Container entrance animation */
+@keyframes containerEntrance {
+  0%   { transform: scale(0.8); opacity: 0; }
+  100% { transform: scale(1);   opacity: 1; }
+}
+
+/* Timer Face and Display */
+.timer-face {
+  margin: 20px 0;
+}
+
+.timer-display {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Timer face (flap) styling */
+.flap {
+  position: relative;
+  margin: 0 5px;
+  padding: 10px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #fff, #e6e6e6);
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+
+/* Animation for when the timer face is updated (zoom/fade with color change) */
+.flapChanged {
+  animation: flapChangedAnim 0.6s ease-in-out;
+}
+
+@keyframes flapChangedAnim {
+  0% {
+    transform: scale(1);
+    background-color: #ffe4e1; /* Light pinkish */
+  }
+  50% {
+    transform: scale(1.2);
+    background-color: #ffc1b6; /* Highlight color */
+  }
+  100% {
+    transform: scale(1);
+    background-color: #fff;
+  }
+}
+
+/* Optional: Additional scale animation if needed */
+.flap.animate-face {
+  animation: scaleUpDown 0.5s ease-in-out;
+}
+
+@keyframes scaleUpDown {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+/* Number display styling */
+.display {
+  font-size: 2rem;
+  font-weight: 600;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+/* Highlight effect on update */
+.display.updated {
+  background-color: rgba(255, 255, 0, 0.3);
+  transform: scale(1.1);
+}
+
+/* Colon styling */
+.colon {
+  font-size: 2rem;
+  margin: 0 5px;
+  transition: color 0.3s ease;
+}
+
+/* Label and button icon styles */
+.label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+
+.label-text {
+  margin: 0 10px;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+.btn-icon {
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+/* Limit icon sizes */
+.btn-icon img {
+  width: 24px;
+  height: 24px;
+}
+
+.btn-icon:hover {
+  transform: scale(1.2);
+}
+
+.btn-icon:disabled {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+/* Controls styling */
+.controls {
+  margin-top: 20px;
+}
+
+/* Control button base styling */
+.ctrl-btn {
+  padding: 10px 20px;
+  margin: 0 10px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
+  color: #fff;
+  transition: opacity 0.5s ease-in-out, background 0.5s ease-in-out, transform 0.3s ease;
+}
+
+/* Disabled state styling using :disabled pseudo-class */
+.ctrl-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  background: #ccc;
+  color: #999;
+}
+
+/* Fade transitions for the control button text */
+#control-text {
+  display: inline-block;
+  transition: opacity 0.5s ease;
+}
+
+#control-text.fade-out {
+  opacity: 0;
+}
+
+#control-text.fade-in {
+  opacity: 1;
+}
+
+/* Time-up message styling with pulse animation */
+.time-up {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #d9534f;
+  margin-top: 20px;
+  animation: timeUpPulse 1.5s infinite;
+}
+
+/* Custom Popover */
+.custom-popover {
+  position: absolute;
+  background: #333;
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: clamp(0.8rem, 1vw, 1rem);
+  white-space: nowrap;
+  z-index: 1000;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  transform: translate(-50%, -100%);
+  animation: fadeInText 0.5s ease-in-out forwards;
+}
+
+@keyframes fadeInText {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+
+@keyframes timeUpPulse {
+  0%   { transform: scale(1);   opacity: 1; }
+  50%  { transform: scale(1.1); opacity: 0.5; }
+  100% { transform: scale(1);   opacity: 1; }
+}
+
+/* Optional container hover effect (wobble) */
+.t-container:hover {
+  animation: containerHover 1s infinite alternate;
+}
+
+@keyframes containerHover {
+  0%   { transform: rotate(-1deg) scale(1); }
+  50%  { transform: rotate(1deg)  scale(1.01); }
+  100% { transform: rotate(-1deg) scale(1); }
+}

@@ -4,5 +4,7 @@ zeero_env/
 db.sqlite3
 .idea
 staticfiles/
+.venv/
 venv/
 .env
+staticfiles**

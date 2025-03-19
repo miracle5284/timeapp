@@ -1,205 +1,137 @@
-# Timer System
-
-This is a Django-based countdown timer web application that allows users to set, pause, and reset a timer. The timer state is stored in Django sessions, enabling persistence across requests.
 
 ---
 
-## Features
-- Single Page Application (SPA) for seamless user experience.
-- Set a countdown timer with hours, minutes, and seconds.
-- Start, pause, and reset the timer.
-- Timer persistence using Django session storage.
-- Production-ready Django setup with error handling and security enhancements.
-- Deployable with Docker and Heroku.
-- **Live Demo**: Access the app live on Heroku at [https://lit-castle-92004-64995737305f.herokuapp.com/timer/](https://lit-castle-92004-64995737305f.herokuapp.com/timer/)
+# Timer System
+
+Timer System is a Django-based countdown timer web application that empowers you to manage your time effectively. With features such as setting, pausing, and resetting the timer, the app ensures that your countdown remains accurate—even after page refreshes—by persisting state in Django sessions. For best performance, Timer System works in tandem with the Timer Keeper Active extension, a lightweight Chrome extension that prevents background throttling, ensuring your timer continues running even when your browser is in battery saver mode.
+
+---
+
+## Summary
+
+Timer System delivers a seamless and reliable countdown experience. Modern browsers often slow down or pause background tabs to conserve power, which can cause timers to reset or lose accuracy. Timer System overcomes this challenge by using Django sessions for persistent timer state, while the Timer Keeper Active extension injects performance-enhancing scripts into your timer page. Together, they guarantee that your countdown remains uninterrupted and accurate, whether you’re a professional, student, or someone who values precise time management.
+
+---
+
+## Key Features
+
+### Timer System Web App
+
+- **Persistent Countdown:**  
+  Your timer state (duration, start, and pause times) is stored in Django sessions, so the countdown remains accurate even after a page refresh.
+
+- **Interactive Timer Controls:**  
+  - **Start, Pause, and Reset:** Manage your timer effortlessly.  
+  - **Editable Input:** Modify hours, minutes, and seconds directly using on-screen controls and +/– buttons.
+  
+- **Responsive Single-Page Application (SPA):**  
+  Enjoy a smooth user experience across devices with a modern, dynamic interface.
+  
+- **Robust API Endpoints:**  
+  Control the timer via RESTful endpoints:
+  - **Set Timer:** `POST /timer/set_timer`
+  - **Pause Timer:** `PUT /timer/pause_timer`
+  - **Reset Timer:** `PUT /timer/reset_timer`
+  
+- **Production-Ready Deployment:**  
+  Designed with error handling and security enhancements, Timer System can be deployed locally, via Docker, or on cloud platforms like Heroku.
+
+### Timer Keeper Active Extension
+
+- **Background Throttling Prevention:**  
+  Ensures that your timer remains active and precise by preventing Chrome’s background throttling.
+  
+- **High Performance Mode:**  
+  Uses advanced techniques to request increased processing priority for your timer page.
+  
+- **Wake Lock Integration:**  
+  Optionally keeps your screen active, ensuring uninterrupted timer performance.
+  
+- **Seamless Integration:**  
+  Automatically injects scripts into your timer website so that your countdown never stops—even when the browser is refreshed or closed.
+  
+- **User-Friendly Configuration:**  
+  An intuitive options page lets you toggle features like high performance mode, wake lock, and DoNot Disturb mode with ease.
+
+**For optimal performance, we highly recommend installing Timer Keeper Active.**  
+- **GitHub Repository:** [Timer Keeper Active on GitHub](https://github.com/miracle5284/timer-keeper-extension)  
+- **Chrome Web Store:** [Timer Keeper Active – Chrome Web Store](https://chromewebstore.google.com/detail/jndhblddppbjacboankdagkmbnnmpbdf)
 
 ---
 
 ## Technologies Used
-- **Django**: Backend framework for handling timer logic and session management.
-- **JavaScript (ES6)**: Manages the UI interactions dynamically.
-- **Axios**: Handles API requests for timer actions.
-- **HTML/CSS**: Structures and styles the UI components.
-- **Bootstrap (Optional)**: Used for styling improvements.
-- **SQLite**: Default database for development.
-- **Docker**: Containerization for deployment.
-- **Heroku**: Cloud deployment.
 
+### Timer System Web App
+
+- **Django:** Handles timer logic and session management.
+- **JavaScript (ES6):** Drives dynamic UI interactions.
+- **Axios:** Facilitates API calls for timer operations.
+- **HTML/CSS & Bootstrap (Optional):** Provide a modern, responsive interface.
+- **SQLite:** Serves as the development database.
+- **Docker:** Enable containerized and cloud deployments.
+
+### Timer Keeper Active Extension
+
+- **Manifest v3:** Implements the latest security and performance standards.
+- **Chrome Scripting API:** Dynamically injects performance-enhancing code.
+- **Chrome Storage & Cookies:** Store user settings and integration signals.
+- **Chrome Idle API:** Reapplies performance settings based on system state.
+
+### The Active App is available at:
+**Production Website**: https://timer.blueprime.app
+**Beta Version**: https://staging-timer-app-slim.azurewebsites.net
 ---
 
-## Project Structure
+## Getting Started
 
-```
-zeero/
-│── manage.py               # Django project management script
-│── requirements.txt        # Dependencies
-│── Dockerfile              # Docker container setup
-│── heroku.yml              # Heroku deployment config
-│── db.sqlite3              # SQLite database (for development)
-│── static/                 # Static files (images, JavaScript, styles)
-│── timer/                  # Timer app (Django application)
-│   ├── views.py            # Core logic handling timer operations
-│   ├── models.py           # Database models (if needed)
-│   ├── urls.py             # URL routes for timer API
-│   ├── templates/
-│   │   ├── timer.html      # Timer frontend template
-│   ├── static/
-│   │   ├── js/timer.js     # Timer JavaScript functionality
-│   │   ├── styles/style.css # Timer styling
-│── zeero/                  # Main Django project settings
-│   ├── settings.py         # Django settings
-│   ├── urls.py             # Project-wide URL configuration
-│   ├── wsgi.py             # WSGI application entry point
-```
+### Timer System Web App
 
----
+1. **Clone the Repository:**
+   ```bash
+   git clone "https://github.com/miracle5284/timeapp.git">
+   cd timer_system_app
+   ```
 
-## UI Functionality and User Flow
+2. **Create a Virtual Environment and Install Dependencies:**
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   pip install -r requirements.txt
+   ```
 
-![Timer UI](static/imgs/timer_ui.png)
+3. **Run Migrations & Start the Server:**
+   ```bash
+   python manage.py migrate
+   python manage.py runserver
+   ```
+   Open your browser and visit `http://127.0.0.1:8000/timer/` to use the timer.
 
-### **User Expectations**
-- **Persistent Timer**: The timer state remains even after refreshing the page.
-- **Start, Pause, Reset Controls**:
-  - Clicking **Start** begins the countdown.
-  - Clicking **Pause** stops the timer but retains the remaining time.
-  - Clicking **Reset** restores the timer to the initially set duration.
-- **Editable Time Input**:
-  - Users can manually edit the displayed hours, minutes, and seconds.
-  - Users can also increment/decrement values using the **+ and - buttons**.
-- **Disabled Buttons**:
-  - While the timer is running, the **+ and - buttons** are disabled to prevent modifications.
-  - The **Start button** changes to **Pause** when active.
-- **Time-Up Notification**:
-  - When the countdown reaches zero, **"Time Up!!!"** appears in red.
+4. **Deployment Options:**
+   Deploy using Docker or Heroku by following the instructions in the repository.
 
----
+### Timer Keeper Active Extension
 
-## API Endpoints
+1. **Load the Extension Locally:**
+   - Open Chrome and navigate to `chrome://extensions`.
+   - Enable “Developer mode” and click “Load unpacked.”
+   - Select the `timer-keeper` folder.
 
-### 1. **Set Timer**
-- **Endpoint:** `POST /timer/set_timer`
-- **Request Body:**
-  ```json
-  {
-    "duration": 120, 
-    "initialDuration": 120
-  }
-  ```
-- **Response:**
-  ```json
-  {"success": true}
-  ```
-- **Functionality:** Starts a new timer session with the provided duration.
+2. **Configure Settings:**
+   Access the options page through the extension icon to customize features like high performance mode, wake lock, and Do Not Disturb.
 
-### 2. **Pause Timer**
-- **Endpoint:** `PUT /timer/pause_timer`
-- **Response:**
-  ```json
-  {"success": true}
-  ```
-- **Functionality:** Pauses the active timer and stores the pause time in the session.
+3. **Automatic Integration:**
+   The extension automatically injects its code into your timer website, ensuring that your countdown remains active even when the browser is in battery saver mode.
 
-### 3. **Reset Timer**
-- **Endpoint:** `PUT /timer/reset_timer`
-- **Response:**
-  ```json
-  {"success": true}
-  ```
-- **Functionality:** Resets the timer back to the initially set duration.
-
----
-
-## Logic Overview
-
-1. **Session-Based State Management:**
-   - The timer duration, start time, and pause time are stored in Django sessions.
-   - On page reload, the timer state is retained.
-
-2. **Timer Logic:**
-   - When the timer starts, the `start_time` is stored.
-   - When paused, the `pause_time` is recorded.
-   - On resumption, the remaining duration is calculated based on these timestamps.
-
-3. **Frontend Integration:**
-   - The UI dynamically updates the timer display via JavaScript.
-   - API calls are made via `axios` for timer actions.
-
----
-
-## Deployment Guide
-
-### **Local Development**
-#### **1. Clone the Repository**
-```sh
-$ git clone <repo-url>
-$ cd timer_assessment
-```
-
-#### **2. Create a Virtual Environment**
-```sh
-$ python -m venv venv
-$ source venv/bin/activate  # On Windows use `venv\Scripts\activate`
-```
-
-#### **3. Install Dependencies**
-```sh
-$ pip install -r requirements.txt
-```
-
-#### **4. Run Migrations & Start Server**
-```sh
-$ python manage.py migrate
-$ python manage.py runserver
-```
-
-#### **5. Open in Browser**
-Visit `http://127.0.0.1:8000/timer/` to use the timer.
-
----
-
-### **Docker Deployment**
-#### **1. Build and Run Docker Container**
-```sh
-$ docker build -t timer-app .
-$ docker run -p 8000:8000 timer-app
-```
-
-#### **2. Open in Browser**
-Visit `http://localhost:8000/timer/`.
-
----
-
-### **Deploying to Heroku**
-#### **1. Login to Heroku**
-```sh
-$ heroku login
-```
-
-#### **2. Create a New App**
-```sh
-$ heroku create timer-app
-```
-
-#### **3. Deploy to Heroku**
-```sh
-$ git push heroku main
-```
-
-#### **4. Run Migrations on Heroku**
-```sh
-$ heroku run python manage.py migrate
-```
-
-#### **5. Open the Deployed App**
-```sh
-$ heroku open
-```
+4. **Additional Resources:**
+   - **GitHub Repository:** [Timer Keeper Active on GitHub](https://github.com/miracle5284/timer-keeper-extension)
+   - **Chrome Web Store:** [Timer Keeper Active – Chrome Web Store](https://chromewebstore.google.com/detail/jndhblddppbjacboankdagkmbnnmpbdf)
 
 ---
 
 ## Conclusion
-This system provides a simple and effective countdown timer with API-based control. It can be run locally, in a Docker container, or deployed on Heroku for production use.
 
-Let me know if you need further refinements! 🚀
+Timer System and Timer Keeper Active work together to deliver a robust and reliable countdown timer experience. Timer System ensures that your timer’s state is preserved and managed efficiently, while Timer Keeper Active guarantees that your timer remains active and immune to background throttling. This integrated solution is ideal for professionals, students, and everyday users who depend on accurate, uninterrupted timing.
 
+**Download Timer Keeper Active today from the Chrome Web Store and experience uninterrupted, accurate timing—every minute counts!**
+
+---
