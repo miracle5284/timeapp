@@ -1,0 +1,219 @@
+/* Reset and basic styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #fad0c4, #ff9a9e);
+  background-size: 400% 400%;
+  animation: gradientAnimation 15s ease infinite;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+/* Background Animation */
+@keyframes gradientAnimation {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Container Styling */
+.t-container {
+  width: 90%;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow: auto;
+  background: linear-gradient(135deg, #ffffff, #f0f0f0);
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  margin: auto;
+  text-align: center;
+  transition: background 0.8s ease-in-out, transform 0.5s ease-in-out, box-shadow 0.5s ease-in-out;
+}
+
+/* Mouse-In Effect: Stronger Background Change & Zoom In */
+.t-container:hover {
+  background: linear-gradient(135deg, #e3e3e3, #ffffff);
+  transform: scale(1.05);  /* Zoom-in effect */
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+}
+
+/* Responsive Container */
+@media (max-width: 768px) {
+  .t-container {
+    width: 95%;
+    padding: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .t-container {
+    width: 100%;
+    padding: 15px;
+    border-radius: 8px;
+  }
+}
+
+/* Timer Display */
+.timer-face {
+  margin: 15px 0;
+}
+
+.timer-display {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* Timer face styling */
+.flap {
+  position: relative;
+  margin: 5px;
+  padding: 10px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #fff, #e6e6e6);
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+
+/* Animation when the timer face updates */
+.flapChanged {
+  animation: flapChangedAnim 0.5s ease-in-out;
+}
+
+@keyframes flapChangedAnim {
+  0%   { transform: scale(1); background-color: #ffe4e1; }
+  50%  { transform: scale(1.05); background-color: #ffc1b6; }
+  100% { transform: scale(1); background-color: #fff; }
+}
+
+/* Number Display */
+.display {
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  font-weight: 600;
+  transition: color 0.5s ease-in-out, transform 0.3s ease;
+}
+
+/* Highlight effect on hover */
+.t-container:hover .display {
+  color: #6a11cb;
+}
+
+/* Colon Styling */
+.colon {
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  margin: 0 5px;
+  transition: color 0.3s ease;
+}
+
+/* Label Styling */
+.label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 5px;
+  flex-wrap: wrap;
+}
+
+.label-text {
+  margin: 0 10px;
+  font-weight: 600;
+  font-size: clamp(0.8rem, 2vw, 1rem);
+  transition: color 0.3s ease;
+}
+
+/* Button Styling */
+.btn-icon {
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.btn-icon img {
+  width: 20px;
+  height: 20px;
+}
+
+.btn-icon:hover {
+  transform: scale(1.1);
+}
+
+.btn-icon:disabled {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+/* Control Buttons */
+.controls {
+  margin-top: 20px;
+}
+
+.ctrl-btn {
+  padding: 10px 18px;
+  margin: 5px;
+  font-size: clamp(0.9rem, 2vw, 1rem);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
+  color: #fff;
+  transition: background 0.5s ease-in-out, transform 0.2s ease-in-out;
+}
+
+/* Button Hover Effect */
+.ctrl-btn:hover {
+  transform: scale(1.05);
+  background: linear-gradient(135deg, #2575fc, #6a11cb);
+}
+
+/* Disabled Button */
+.ctrl-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  background: #ccc;
+  color: #999;
+}
+
+/* Time-up Message */
+.time-up {
+  font-size: clamp(1.2rem, 2vw, 1.5rem);
+  font-weight: bold;
+  color: #d9534f;
+  margin-top: 20px;
+  animation: timeUpPulse 1.5s infinite;
+}
+
+@keyframes timeUpPulse {
+  0%   { transform: scale(1); opacity: 1; }
+  50%  { transform: scale(1.05); opacity: 0.7; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Custom Popover */
+.custom-popover {
+  position: absolute;
+  background: #333;
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: clamp(0.8rem, 1vw, 1rem);
+  white-space: nowrap;
+  z-index: 1000;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  transform: translate(-50%, -100%);
+  animation: fadeInText 0.5s ease-in-out forwards;
+}
+
+@keyframes fadeInText {
+  0%   { opacity: 0; }
+  100% { opacity: 1; }
+}

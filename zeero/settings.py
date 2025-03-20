@@ -27,12 +27,21 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = int(os.environ.get('DEBUG', 0))
+DEBUG = int(os.environ.get('DEBUG', 1))
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'lit-castle-92004-64995737305f.herokuapp.com']
-CSRF_TRUSTED_ORIGINS = [
-    "https://lit-castle-92004-64995737305f.herokuapp.com",
-]
+PRODUCTION_SERVERs = os.environ.get('PRODUCTION_SERVERS')
+
+
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+EXTENSION_ID = os.environ.get('EXTENSION_ID')
+
+if PRODUCTION_SERVERs:
+
+    PRODUCTION_SERVER_URLs = PRODUCTION_SERVERs.split(', ')
+    ALLOWED_HOSTS += PRODUCTION_SERVER_URLs
+    CSRF_TRUSTED_ORIGINS = PRODUCTION_SERVER_URLs
+    CORS_ALLOWED_ORIGINS = PRODUCTION_SERVER_URLs
+
 
 
 # Application definition
@@ -44,13 +53,15 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'timer'
+    'timer',
+    'corsheaders'
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
