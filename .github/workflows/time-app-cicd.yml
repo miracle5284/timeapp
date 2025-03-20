@@ -25,23 +25,23 @@ jobs:
 
           if [[ "$GITHUB_REF" == refs/heads/* ]]; then
             if [ "$REF_NAME" = "develop" ]; then
-              echo "ENVIRONMENT=develop" >> $GITHUB_ENV
+              echo "ENVIRONMENT=develop" >> $GITHUB_OUTPUT
             elif [ "$REF_NAME" = "staging" ]; then
-              echo "ENVIRONMENT=staging" >> $GITHUB_ENV
+              echo "ENVIRONMENT=staging" >> $GITHUB_OUTPUT
             elif [ "$REF_NAME" = "master" ]; then
-              echo "ENVIRONMENT=production" >> $GITHUB_ENV
+              echo "ENVIRONMENT=production" >> $GITHUB_OUTPUT
             else
-              echo "ENVIRONMENT=unknown" >> $GITHUB_ENV
+              echo "ENVIRONMENT=unknown" >> $GITHUB_OUTPUT
             fi
           elif [[ "$GITHUB_REF" == refs/tags/* ]]; then
-            echo "ENVIRONMENT=production" >> $GITHUB_ENV  # You can adjust this as needed for tags
+            echo "ENVIRONMENT=production" >> $GITHUB_OUTPUT
           else
-            echo "ENVIRONMENT=unknown" >> $GITHUB_ENV
+            echo "ENVIRONMENT=unknown" >> $GITHUB_OUTPUT
           fi
 
       - name: Get Env Variables
         run: |
-          echo "Environment: ${{ env.ENVIRONMENT }}"
+          echo "Environment: ${{ steps.set-env.outputs.ENVIRONMENT }}"
 
   build:
     runs-on: ubuntu-latest
