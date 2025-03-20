@@ -12,6 +12,7 @@ const extensionInstallBtnId = "installLink";
 const extensionEnableBtnId = "enableLink";
 const extensionPromptId = "extensionPrompt";
 const dataContainerId = "data-container";
+const CHROME_EXTENSION_PREFIX_URL = "https://chromewebstore.google.com/detail"
 
 
 function sleep(ms) {
@@ -46,9 +47,7 @@ function checkForExtension() {
       extensionInstallBtn.style.display = "inline";
       extensionEnableBtn.style.display = "none";
       extensionInstallBtn.addEventListener("click", () => {
-        const extensionStoreUrl = `https://chromewebstore.google.com/detail/${dataContainerDiv.getAttribute("data-extension-id")}`;
-        alert(`Redirecting to: ${extensionStoreUrl}`);
-        window.location.href = extensionStoreUrl;
+        window.location.href = `${CHROME_EXTENSION_PREFIX_URL}/${dataContainerDiv.getAttribute("data-extension-id")}`;
       });
     }
   } catch (error) {
