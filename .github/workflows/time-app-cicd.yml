@@ -3,7 +3,7 @@ name: Build and deploy Time App
 on:
   push:
     branches: [ "develop", "staging"]
-    tags: [ "*"]
+    tags: [ "*" ]
 
   workflow_dispatch:
 
@@ -20,22 +20,29 @@ jobs:
       - name: Determine Environment
         id: set-env
         run: |
-          BRANCH_NAME="${GITHUB_REF##*/}"
+          REF_TYPE="${GITHUB_REF#refs/*/}"
+          REF_NAME="${GITHUB_REF##*/}"
 
-          if [ "$BRANCH_NAME" = "develop" ]; then
-            echo "ENVIRONMENT=develop" >> $GITHUB_OUTPUT
-          elif [ "$BRANCH_NAME" = "staging" ]; then
-            echo "ENVIRONMENT=staging" >> $GITHUB_OUTPUT
-          elif [ "$BRANCH_NAME" = "master" ]; then
-            echo "ENVIRONMENT=production" >> $GITHUB_OUTPUT
+          if [[ "$GITHUB_REF" == refs/heads/* ]]; then
+            if [ "$REF_NAME" = "develop" ]; then
+              echo "ENVIRONMENT=develop" >> $GITHUB_ENV
+            elif [ "$REF_NAME" = "staging" ]; then
+              echo "ENVIRONMENT=staging" >> $GITHUB_ENV
+            elif [ "$REF_NAME" = "master" ]; then
+              echo "ENVIRONMENT=production" >> $GITHUB_ENV
+            else
+              echo "ENVIRONMENT=unknown" >> $GITHUB_ENV
+            fi
+          elif [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            echo "ENVIRONMENT=production" >> $GITHUB_ENV  # You can adjust this as needed for tags
           else
-            # Default or fallback
-            echo "ENVIRONMENT=unknown" >> $GITHUB_OUTPUT
+            echo "ENVIRONMENT=unknown" >> $GITHUB_ENV
           fi
 
       - name: Get Env Variables
         run: |
-          echo "Environment: ${{ steps.set-env.outputs.ENVIRONMENT }}"
+          echo "Environment: ${{ env.ENVIRONMENT }}"
+
   build:
     runs-on: ubuntu-latest
     needs: prepare
