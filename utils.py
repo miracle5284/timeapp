@@ -19,3 +19,7 @@ def calculate_elapsed_time(start_time, pause_time=None):
 def calculate_end_time_in_string(start: str, duration: float | int) -> str:
     start = datetime.fromisoformat(start)
     return (start + timedelta(seconds=duration)).strftime('%Y-%m-%d %H:%M:%S')
+
+
+def sub_dict(_dict, *keys):
+    return {key: getattr(_dict, key) for key in keys}
