@@ -34,6 +34,13 @@ PRODUCTION_SERVERs = os.environ.get('PRODUCTION_SERVERS')
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 EXTENSION_ID = os.environ.get('EXTENSION_ID')
+EXTENSION_NAME = os.environ.get('EXTENSION_NAME')
+CORS_ALLOWED_ORIGINS = []
+CORS_ALLOW_CREDENTIALS = True
+
+SESSION_COOKIE_SAMESITE = "None"
+SESSION_COOKIE_SECURE = True
+
 
 if PRODUCTION_SERVERs:
 
@@ -54,15 +61,17 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'timer',
-    'corsheaders'
+    'corsheaders',
+    'countdown',
+    'rest_framework'
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
