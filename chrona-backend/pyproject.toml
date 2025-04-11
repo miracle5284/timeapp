@@ -1,0 +1,33 @@
+[project]
+name = "chrona-backend"
+version = "2.0.0"
+description = "A sleek, efficient, customizable countdown timer with smooth animations."
+authors = [
+    {name = "Miracle Mayowa Adebunmi",email = "blueprime91@gmail.com"}
+]
+license = {text = "Proprietary"}
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "django (==5.1.7)",
+    "djangorestframework (>=3.16.0,<4.0.0)",
+    "python-decouple (>=3.8,<4.0)",
+    "django-storages (>=1.14.6,<2.0.0)",
+    "psycopg2-binary (>=2.9.10,<3.0.0)",
+    "djangorestframework-simplejwt (>=5.5.0,<6.0.0)",
+    "django-allauth (>=65.7.0,<66.0.0)",
+    "dj-rest-auth (>=7.0.1,<8.0.0)",
+    "boto3 (>=1.37.29,<2.0.0)",
+    "social-auth-app-django (>=5.4.3,<6.0.0)",
+    "social-auth-core (>=4.5.6,<5.0.0)",
+    "redis (>=5.2.1,<6.0.0)",
+    "drf-yasg (>=1.21.10,<2.0.0)",
+    "python-json-logger (>=3.3.0,<4.0.0)",
+    "gunicorn (>=23.0.0,<24.0.0)",
+    "django-cors-headers (>=4.7.0,<5.0.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
