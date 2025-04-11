@@ -3,7 +3,7 @@ import os
 from django.conf import settings
 
 redis_client = redis.Redis(
-    host=os.getenv("REDIS_HOST", "localhost"),
-    port=int(os.getenv("REDIS_PORT", 6379)),
+    host= settings.REDIS_HOST,
+    port= settings.REDIS_PORT,
     decode_responses=True,
 )

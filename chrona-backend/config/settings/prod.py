@@ -48,7 +48,8 @@ timer_static = BASE_DIR / 'chrona' / 'static'
 if timer_static.exists():
     STATICFILES_DIRS.append(timer_static)
 
-
+REDIS_HOST = config('REDIS_HOST', default='localhost')
+REDIS_PORT = config('REDIS_PORT', default='6379')
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -70,6 +71,10 @@ LOGGING = {
             'class': 'config.logging_handlers.RedisStreamHandler',
             'formatter': 'json',
         },
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'standard',  # or 'json' if you want JSON logs in console too
+        }
 
     },
 
@@ -80,14 +85,14 @@ LOGGING = {
 
     'loggers': {
         'django': {
-            'handlers': ['console'],
+            'handlers': ['redis', 'console'],
             'level': LOG_LEVEL,
-            'propagate': False,
+            'propagate': True,
         },
         'django.request': {
-            'handlers': ['console'],
+            'handlers': ['redis', 'console'],
             'level': 'ERROR',
-            'propagate': False,
+            'propagate': True,
         },
     }
 }
