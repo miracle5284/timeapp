@@ -1,10 +1,9 @@
-import os
+# app/config.py
 from decouple import config
 
-REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
-REDIS_PORT = int(os.getenv("REDIS_PORT", 6379))
-REDIS_STREAM_KEY = os.getenv("REDIS_STREAM_KEY", "log_events")
-
-SENTRY_DSN = os.getenv("SENTRY_DSN")
-LOGDNA_INGEST_KEY = os.getenv("LOGDNA_INGEST_KEY")
-PUSHGATEWAY_URL = os.getenv("PUSHGATEWAY_URL", "http://localhost:9091")
+REDIS_HOST = config("REDIS_HOST", default="localhost")
+REDIS_PORT = config("REDIS_PORT", default="6379")
+LOG_STREAM = config("LOG_STREAM", default="log_events")
+LOGDNA_API_KEY = config("LOGDNA_API_KEY", default=None)
+SENTRY_DSN = config("SENTRY_DSN", default=None)
+PROMETHEUS_PUSHGATEWAY_URL = config("PROMETHEUS_PUSHGATEWAY_URL", default="http://pushgateway:9091")
