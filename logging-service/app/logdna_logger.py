@@ -56,7 +56,6 @@ def send_log_to_logdna(message, level=logging.INFO, extra=None):
     :param extra: Optional dict of additional context.
     """
     logger.setLevel(level)
-    print('SSSSSSS: ', level)
     logger.log(level, message, extra=extra)
 
 
