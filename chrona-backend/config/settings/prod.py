@@ -68,7 +68,7 @@ LOGGING = {
     'handlers': {
         'redis': {
             'level': LOG_LEVEL,
-            'class': 'config.logging_handlers.RedisStreamHandler',
+            'class': 'config.logging_handlers.AsyncRedisStreamHandler',
             'formatter': 'json',
         },
         'console': {
@@ -85,7 +85,7 @@ LOGGING = {
 
     'loggers': {
         'django': {
-            'handlers': ['redis', 'console'],
+            'handlers': ['redis'],
             'level': LOG_LEVEL,
             'propagate': True,
         },

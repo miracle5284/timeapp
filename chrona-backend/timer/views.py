@@ -11,7 +11,6 @@ from .utils import calculate_elapsed_time
 
 
 # Initialize logger for debugging
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 def ensure_session(request):

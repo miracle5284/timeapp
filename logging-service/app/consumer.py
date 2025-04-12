@@ -3,7 +3,8 @@ import json
 import logging
 import redis.asyncio as async_redis
 from redis.exceptions import ConnectionError as RedisConnectionError, TimeoutError
-from app.config import REDIS_HOST, REDIS_PORT, LOG_STREAM
+from .config import REDIS_HOST, REDIS_PORT, LOG_STREAM
+from .logdna_logger import send_log_to_logdna
 
 logger = logging.getLogger(__name__)
 
@@ -49,15 +50,26 @@ async def consume_logs():
                         # message_data is already { key: value } as strings
                         # If the JSON is stored in "full_message", parse it:
                         full_msg_str = message_data.get("full_message")
+                        level_str = message_data.get("level", 'INFO')
                         if full_msg_str:
                             try:
-                                log_json = json.loads(full_msg_str)
-                                logger.info(f"Parsed JSON log entry: {log_json}")
+                                log_entry = json.loads(full_msg_str)
+                                # logger.info(f"Parsed JSON log entry: {log_json}")
+                                # send_log_to_logdna(log_entry)
+
                             except json.JSONDecodeError:
-                                logger.warning(f"full_message wasn't valid JSON: {full_msg_str}")
+                                # logger.warning(f"full_message wasn't valid JSON: {full_msg_str}")
+                                log_entry = {"message": full_msg_str}
+                        else:
+                            log_entry = {"message": str(message_data)}
 
                         # Or just print the entire dictionary
-                        logger.info("Raw fields from Redis: %s", message_data)
+                        # logger.info("Raw fields from Redis: %s", message_data)
+                        level_str = level_str.lower() == "warning" and "warn" or level_str
+                        level = getattr(logging, level_str.upper())
+                        send_log_to_logdna(log_entry, level=level)
+
+                        await r.xdel(LOG_STREAM, message_id)
 
             except (RedisConnectionError, TimeoutError) as e:
                 logger.error(f"Redis connection error: {e}")
