@@ -3,6 +3,10 @@ import asyncio
 import logging
 from app.consumer import consume_logs
 from contextlib import asynccontextmanager
+from prometheus_client import generate_latest, Counter
+from starlette.responses import PlainTextResponse
+
+REQUEST_COUNT = Counter("logging_service_requests_total", "Number of requests to logging-service")
 
 # Set up logging
 logging.basicConfig(
@@ -51,5 +55,10 @@ def test_log():
     logger.setLevel("INFO")
     logger.info("This is a test log message from the /test-log endpoint.", extra={"user_id": 999})
     return {"message": "Test log sent!"}
+
+@app.get("/metrics", response_class=PlainTextResponse)
+def metrics():
+    REQUEST_COUNT.inc()
+    return generate_latest()
 
 logger.info("Logging service initialized. Listening for logs...")
