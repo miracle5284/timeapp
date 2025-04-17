@@ -1,5 +1,4 @@
 from django.db import models
-from django.contrib.
 from django.contrib.auth.models import AbstractUser
 from utils.orm import SmartUserManager, Model as SmartModel
 from django.utils.translation import gettext_lazy as _
@@ -31,3 +30,15 @@ class User(AbstractUser, SmartModel):
         verbose_name = _('User')
         verbose_name_plural = _('Users')
         safe_search_fields = ['email', 'username', 'first_name', 'last_name']
+
+#
+# class UserProfile(models.Model):
+#     """
+#     User profile model to store additional information about the user.
+#     """
+#     user = models.OneToOneField(User, on_delete=models.CASCADE)
+#     bio = models.TextField(blank=True, null=True)
+#     profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True)
+#
+#     def __str__(self):
+#         return f"{self.user.username}'s Profile"
