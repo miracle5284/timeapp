@@ -30,15 +30,13 @@ class HMACModelBase(models.base.ModelBase):
             if hmac_field_name not in attrs:
                 field_class = type(original_field)
                 max_length = getattr(original_field, 'max_length', 255)
-
                 # TODO - check if the field is a TextField or CharField
                 # if isinstance(original_field, EncryptedTextField):
                 #     attrs[hmac_field_name] = models.TextField(editable=False, db_index=True)
                 # else:
-
-                # Default: create CharField as HMAC mirror field
-                attrs[hmac_field_name] = models.CharField(editable=False, db_index=True)
-
+                _, _, args, _kwargs = original_field.deconstruct()
+                _kwargs.update({'editable': False, 'db_index': True})
+                attrs[hmac_field_name] = models.CharField(*args, **_kwargs)
         return super().__new__(cls, name, bases, attrs, **kwargs)
 
 
