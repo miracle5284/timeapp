@@ -320,6 +320,7 @@ EMAIL_HOST_PASSWORD = config('SMTP_PASSWORD')
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='webmaster@localhost')
 
 FERNET_ENCRYPTION_KEY = config('F_N__ENCRYPTION')
+HMAC_KEY = config('HMAC_KEY')
 
 # LOGGING
 LOG_LEVEL = config('LOG_LEVEL', default='INFO')
