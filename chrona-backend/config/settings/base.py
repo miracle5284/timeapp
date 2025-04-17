@@ -206,6 +206,8 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
+PASSWORD_HASHERS = [
+    'django.contrib.auth.hashers.Argon2PasswordHasher',
 ]
 
 
@@ -309,7 +311,6 @@ SOCIAL_AUTH_PIPELINE = (
 LOGIN_REDIRECT_URL = "/"  # Adjust if needed
 LOGOUT_REDIRECT_URL = "/"
 
-
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = config('SMTP_HOST')
 EMAIL_PORT = config('EMAIL_PORT', cast=int, default=587)
@@ -318,6 +319,7 @@ EMAIL_HOST_USER = config('SMTP_USER')
 EMAIL_HOST_PASSWORD = config('SMTP_PASSWORD')
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='webmaster@localhost')
 
+FERNET_ENCRYPTION_KEY = config('F_N__ENCRYPTION')
 
 # LOGGING
 LOG_LEVEL = config('LOG_LEVEL', default='INFO')
