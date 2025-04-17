@@ -23,4 +23,5 @@ urlpatterns = [
     path('', include('timer.urls')),
     path('auth/', include('social_django.urls', namespace='social')),
     path('v2/countdown/', include('countdown.urls')),
+    path('users/', include('users.urls')),
 ]

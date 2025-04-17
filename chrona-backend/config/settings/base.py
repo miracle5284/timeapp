@@ -13,6 +13,7 @@ import os
 from pathlib import Path
 from decouple import config, Csv
 from datetime import timedelta
+import utils.django_meta_patch
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -65,6 +66,7 @@ INSTALLED_APPS = [
     # Apps
     'timer',
     'countdown',
+    'users',
 
 
     # Third Party
@@ -257,7 +259,8 @@ MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
+# User Management
+AUTH_USER_MODEL = 'users.User'
 
 # Social Auth Settings
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = config("SOCIAL_AUTH_GOOGLE_CLIENT_ID")
