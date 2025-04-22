@@ -132,10 +132,10 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # REST Framework
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework.authentication.SessionAuthentication",
-        "rest_framework.authentication.TokenAuthentication",
+        # "rest_framework.authentication.SessionAuthentication",
+        # "rest_framework.authentication.TokenAuthentication",
         # You can also add JWT if using something like SimpleJWT
-        "rest_framework_simplejwt.authentication.JWTAuthentication",
+        "utils.auth.JWTAuthentication",
     ],
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",  # Default to secure
