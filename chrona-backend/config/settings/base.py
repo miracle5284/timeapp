@@ -333,6 +333,9 @@ DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='webmaster@localhost')
 FERNET_ENCRYPTION_KEY = config('F_N__ENCRYPTION')
 HMAC_KEY = config('HMAC_KEY')
 
+EXTENSION_ID = config('EXTENSION_ID')
+EXTENSION_NAME = config('EXTENSION_NAME')
+
 # LOGGING
 LOG_LEVEL = config('LOG_LEVEL', default='INFO')
 
