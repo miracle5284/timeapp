@@ -1,6 +1,8 @@
-from django.urls import path
-from countdown.views import CountDownView
+from countdown.views import TimerViewSet
+from rest_framework.routers import DefaultRouter
 
-urlpatterns = [
-    path('', CountDownView.as_view(), name='countdown'),
-]
+router = DefaultRouter()
+router.register(r'countdown', TimerViewSet, basename='timer')
+
+
+urlpatterns = router.urls

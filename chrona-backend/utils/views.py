@@ -1,5 +1,6 @@
 import inflection
 from rest_framework import generics
+from rest_framework.viewsets import ModelViewSet
 
 from .parsers import CamelCaseJSONParser
 from .renderers import CamelCaseJSONRenderer
@@ -7,23 +8,25 @@ from .renderers import CamelCaseJSONRenderer
 
 class BaseView:
     """
-    Base view mixin that provides automatic camelCase to snake_case transformation
-    for request parsing and response rendering in Django REST Framework.
+    A reusable base view mixin that enforces camelCase ↔ snake_case transformations
+    for API requests and responses in Django REST Framework.
 
-    - Converts incoming camelCase JSON keys to snake_case for Python serializers.
-    - Converts outgoing snake_case response keys to camelCase for JavaScript clients.
+    Features:
+    - Converts camelCase JSON input from JavaScript clients to snake_case.
+    - Converts snake_case DRF output to camelCase before returning JSON.
+    - Automatically applies user-based filtering on queryset.
     """
 
-    camelize_response = True  # Enable camelCase rendering for responses
-    decamelize_request = True  # Enable snake_case conversion for incoming data
+    camelize_response = True      # Enable camelCase rendering in responses
+    decamelize_request = True     # Enable snake_case conversion for incoming JSON
 
     @property
     def decamelize_query_params(self):
         """
-        Converts incoming camelCase query parameters to snake_case.
+        Transform camelCase query parameters into snake_case for backend use.
 
         Returns:
-            dict: Query parameters with snake_case keys.
+            dict: Query parameters with keys converted to snake_case.
         """
         return {
             inflection.underscore(k): v
@@ -32,11 +35,10 @@ class BaseView:
 
     def get_renderers(self):
         """
-        Overrides DRF's renderer selection to apply CamelCaseJSONRenderer
-        if `camelize_response` is True.
+        Use custom CamelCaseJSONRenderer if camelize_response is enabled.
 
         Returns:
-            list: List of renderer instances.
+            list: List of renderer classes.
         """
         if self.camelize_response:
             return [CamelCaseJSONRenderer()]
@@ -44,34 +46,51 @@ class BaseView:
 
     def get_parsers(self):
         """
-        Overrides DRF's parser selection to apply CamelCaseJSONParser
-        if `decamelize_request` is True.
+        Use custom CamelCaseJSONParser if decamelize_request is enabled.
 
         Returns:
-            list: List of parser instances.
+            list: List of parser classes.
         """
         if self.decamelize_request:
             return [CamelCaseJSONParser()]
         return super().get_parsers()
 
+    def get_queryset(self):
+        """
+        Default queryset restricted to objects belonging to the authenticated user.
+
+        Returns:
+            QuerySet: User-filtered queryset from the serializer's model.
+        """
+        serializer_cls = self.get_serializer_class()
+        model = serializer_cls.Meta.model
+        return model.objects.filter(user_id=self.request.user.id)
+
 
 class BaseCreateAPIView(BaseView, generics.CreateAPIView):
     """
-    Base API view for creating resources, with camelCase input/output handling.
+    Base view for creating resources with automatic camelCase parsing/rendering.
     """
     pass
 
 
 class BaseGenericAPIView(BaseView, generics.GenericAPIView):
     """
-    Base generic view with camelCase input/output handling.
+    Generic base view for DRF views that need camelCase JSON compatibility.
     """
     pass
 
 
 class BaseListUpdateAPIView(BaseView, generics.ListAPIView, generics.UpdateAPIView):
     """
-    Base API view that supports listing and updating resources,
-    with camelCase support for both input and output.
+    Base view supporting both list and update operations with camelCase I/O.
+    """
+    pass
+
+
+class BaseModelViewSet(BaseView, ModelViewSet):
+    """
+    Base viewset class with camelCase JSON parsing/rendering and user scoping.
+    Suitable for full CRUD ViewSet definitions.
     """
     pass

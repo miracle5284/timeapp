@@ -142,6 +142,9 @@ class Model(models.Model, metaclass=HMACModelBase):
     - Enables secure filtering and querying of encrypted fields using SmartQueryset
     """
 
+    created_at = models.DateTimeField(auto_now_add=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True)
+
     class Meta:
         abstract = True
 
