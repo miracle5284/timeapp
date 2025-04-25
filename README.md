@@ -1,137 +1,142 @@
+Absolutely — here’s the **enhanced final version** of your `README.md`, now including a dedicated **"🔐 Encryption & Hashing"** section that explains your cryptographic design choices and usage. This version preserves your strong technical voice and sharp architectural focus:
 
 ---
 
-# Timer System
+```markdown
+# 🕒 Chrona Backend
 
-Timer System is a Django-based countdown timer web application that empowers you to manage your time effectively. With features such as setting, pausing, and resetting the timer, the app ensures that your countdown remains accurate—even after page refreshes—by persisting state in Django sessions. For best performance, Timer System works in tandem with the Timer Keeper Active extension, a lightweight Chrome extension that prevents background throttling, ensuring your timer continues running even when your browser is in battery saver mode.
-
----
-
-## Summary
-
-Timer System delivers a seamless and reliable countdown experience. Modern browsers often slow down or pause background tabs to conserve power, which can cause timers to reset or lose accuracy. Timer System overcomes this challenge by using Django sessions for persistent timer state, while the Timer Keeper Active extension injects performance-enhancing scripts into your timer page. Together, they guarantee that your countdown remains uninterrupted and accurate, whether you’re a professional, student, or someone who values precise time management.
+Chrona is a modern, production-ready countdown timer backend built with **Python**, **Django REST Framework**, and a supporting microservice ecosystem. Designed with precision, scalability, and observability in mind, Chrona delivers real-time countdown tracking, persistent session recovery, and cross-platform synchronization.
 
 ---
 
-## Key Features
+## ⚙️ Technology Stack
 
-### Timer System Web App
-
-- **Persistent Countdown:**  
-  Your timer state (duration, start, and pause times) is stored in Django sessions, so the countdown remains accurate even after a page refresh.
-
-- **Interactive Timer Controls:**  
-  - **Start, Pause, and Reset:** Manage your timer effortlessly.  
-  - **Editable Input:** Modify hours, minutes, and seconds directly using on-screen controls and +/– buttons.
-  
-- **Responsive Single-Page Application (SPA):**  
-  Enjoy a smooth user experience across devices with a modern, dynamic interface.
-  
-- **Robust API Endpoints:**  
-  Control the timer via RESTful endpoints:
-  - **Set Timer:** `POST /timer/set_timer`
-  - **Pause Timer:** `PUT /timer/pause_timer`
-  - **Reset Timer:** `PUT /timer/reset_timer`
-  
-- **Production-Ready Deployment:**  
-  Designed with error handling and security enhancements, Timer System can be deployed locally, via Docker, or on cloud platforms like Heroku.
-
-### Timer Keeper Active Extension
-
-- **Background Throttling Prevention:**  
-  Ensures that your timer remains active and precise by preventing Chrome’s background throttling.
-  
-- **High Performance Mode:**  
-  Uses advanced techniques to request increased processing priority for your timer page.
-  
-- **Wake Lock Integration:**  
-  Optionally keeps your screen active, ensuring uninterrupted timer performance.
-  
-- **Seamless Integration:**  
-  Automatically injects scripts into your timer website so that your countdown never stops—even when the browser is refreshed or closed.
-  
-- **User-Friendly Configuration:**  
-  An intuitive options page lets you toggle features like high performance mode, wake lock, and DoNot Disturb mode with ease.
-
-**For optimal performance, we highly recommend installing Timer Keeper Active.**  
-- **GitHub Repository:** [Timer Keeper Active on GitHub](https://github.com/miracle5284/timer-keeper-extension)  
-- **Chrome Web Store:** [Timer Keeper Active – Chrome Web Store](https://chromewebstore.google.com/detail/jndhblddppbjacboankdagkmbnnmpbdf)
+| Layer            | Technology                                                                 |
+|------------------|----------------------------------------------------------------------------|
+| **Language**     | Python 3.11                                                                |
+| **Framework**    | Django 5.0, Django REST Framework                                           |
+| **Authentication** | JWT (via SimpleJWT), OAuth2 (via django-allauth, dj-rest-auth)           |
+| **Queue**        | Celery + Redis (for async task queuing)                                   |
+| **Database**     | PostgreSQL                                                                 |
+| **Cache/Broker** | Redis                                                                      |
+| **Logging**      | FastAPI logging microservice + Redis Streams                               |
+| **Monitoring**   | Prometheus, Grafana, Sentry, LogDNA                                         |
+| **Environment**  | Python-Decouple, `.env`-based modular settings (`base.py`, `prod.py`, ...) |
+| **Infrastructure** | Azure Container Apps + Bicep (IaC)                                        |
+| **CI/CD**        | GitHub Actions (PR previews, blue-green deploys, test coverage)            |
 
 ---
 
-## Technologies Used
+## 📐 Architecture
 
-### Timer System Web App
+Chrona backend is designed for **resilience**, **security**, and **modularity**. Using a **microservice-inspired architecture**, the core Django API is augmented with a logging service (FastAPI), Redis-powered real-time streams, and task workers that offload time-sensitive operations.
 
-- **Django:** Handles timer logic and session management.
-- **JavaScript (ES6):** Drives dynamic UI interactions.
-- **Axios:** Facilitates API calls for timer operations.
-- **HTML/CSS & Bootstrap (Optional):** Provide a modern, responsive interface.
-- **SQLite:** Serves as the development database.
-- **Docker:** Enable containerized and cloud deployments.
+### 🧠 Key Concepts
 
-### Timer Keeper Active Extension
-
-- **Manifest v3:** Implements the latest security and performance standards.
-- **Chrome Scripting API:** Dynamically injects performance-enhancing code.
-- **Chrome Storage & Cookies:** Store user settings and integration signals.
-- **Chrome Idle API:** Reapplies performance settings based on system state.
-
-### The Active App is available at:
-**Production Website**: https://timer.blueprime.app
-**Beta Version**: https://staging-timer-app-slim.azurewebsites.net
----
-
-## Getting Started
-
-### Timer System Web App
-
-1. **Clone the Repository:**
-   ```bash
-   git clone "https://github.com/miracle5284/timeapp.git">
-   cd timer_system_app
-   ```
-
-2. **Create a Virtual Environment and Install Dependencies:**
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   pip install -r requirements.txt
-   ```
-
-3. **Run Migrations & Start the Server:**
-   ```bash
-   python manage.py migrate
-   python manage.py runserver
-   ```
-   Open your browser and visit `http://127.0.0.1:8000/timer/` to use the timer.
-
-4. **Deployment Options:**
-   Deploy using Docker or Heroku by following the instructions in the repository.
-
-### Timer Keeper Active Extension
-
-1. **Load the Extension Locally:**
-   - Open Chrome and navigate to `chrome://extensions`.
-   - Enable “Developer mode” and click “Load unpacked.”
-   - Select the `timer-keeper` folder.
-
-2. **Configure Settings:**
-   Access the options page through the extension icon to customize features like high performance mode, wake lock, and Do Not Disturb.
-
-3. **Automatic Integration:**
-   The extension automatically injects its code into your timer website, ensuring that your countdown remains active even when the browser is in battery saver mode.
-
-4. **Additional Resources:**
-   - **GitHub Repository:** [Timer Keeper Active on GitHub](https://github.com/miracle5284/timer-keeper-extension)
-   - **Chrome Web Store:** [Timer Keeper Active – Chrome Web Store](https://chromewebstore.google.com/detail/jndhblddppbjacboankdagkmbnnmpbdf)
+- **Session Persistence**: Countdown states are preserved across sessions and devices.
+- **Observable-by-Design**: Every user interaction (start, pause, resume) is logged and monitored via distributed tracing and real-time dashboards.
+- **Decoupled Events**: Redis Streams relay timer events to downstream consumers like logging, analytics, and alerting services.
 
 ---
 
-## Conclusion
+## 🧭 Mermaid Architecture Diagram
 
-Timer System and Timer Keeper Active work together to deliver a robust and reliable countdown timer experience. Timer System ensures that your timer’s state is preserved and managed efficiently, while Timer Keeper Active guarantees that your timer remains active and immune to background throttling. This integrated solution is ideal for professionals, students, and everyday users who depend on accurate, uninterrupted timing.
+```mermaid
+flowchart TD
+    subgraph Web_Client
+        FE[Next.js + Vite + React Query]
+    end
 
-**Download Timer Keeper Active today from the Chrome Web Store and experience uninterrupted, accurate timing—every minute counts!**
+    subgraph Backend_API["Chrona Django Backend"]
+        API[Django REST API]
+        Auth[JWT & OAuth2]
+        DB[(PostgreSQL)]
+        Redis[(Redis – Cache & Broker)]
+        Celery[Celery Worker]
+    end
+
+    subgraph Logging_Service["Logging Microservice"]
+        Logger[FastAPI Logging Microservice]
+    end
+
+    subgraph Monitoring
+        Prometheus
+        Grafana
+        Sentry
+        LogDNA
+    end
+
+    FE -->|HTTP| API
+    API --> Auth
+    API --> DB
+    API --> Redis
+    API -->|Redis Streams| Logger
+    Logger --> Redis
+    Celery --> Redis
+    Prometheus --> API
+    Prometheus --> Logger
+    Grafana --> Prometheus
+    Sentry --> API
+    LogDNA --> Logger
+```
+
+---
+
+## 🛡️ Design Philosophy
+
+- **Secure-by-default**: Follows OWASP top 10 compliance; applies token expiration handling, CORS control, HTTPS enforcement, and secrets isolation.
+- **Cloud-Native**: Deploys on **Azure Container Apps**, orchestrated via **Bicep templates** for full Infrastructure-as-Code (IaC).
+- **Zero-downtime**: Blue-green deployments with GitHub Actions ensure smooth rollouts.
+- **Production-Tuned**: Includes Sentry crash monitoring, Prometheus metrics, and Grafana dashboards for operational visibility.
+- **Future-Proof**: Modular design supports plug-and-play architecture for additional event consumers, analytics engines, or notification services.
+
+---
+
+## 📊 Observability Overview
+
+- **Redis Streams** capture time events (start, pause, resume).
+- **FastAPI logger** pushes structured logs to LogDNA.
+- **Prometheus** scrapes system and app-level metrics.
+- **Grafana** visualizes timer event throughput, queue latencies, and system health.
+- **Sentry** catches runtime and API exceptions.
+
+---
+
+## 🔒 Security Posture
+
+- JWT expiration and refresh workflows handled securely.
+- Social login integrations via OAuth2 providers.
+- Separation of secrets using `python-decouple`, keeping codebase clean.
+- Input sanitization and DRF serializers guard against payload tampering.
+
+---
+
+## 🔐 Encryption & Hashing
+
+Chrona leverages **cryptographically sound defaults** and modern hashing techniques for securing sensitive data:
+
+- **JWT Signing**: Tokens are signed using `HS256`, leveraging a securely stored signing key (`SECRET_KEY`) loaded via environment variables.
+- **Password Hashing**: Django’s `PBKDF2` algorithm (with SHA-256) ensures all user passwords are salted and hashed before storage.
+- **Sensitive Token Storage**: OAuth2 tokens and refresh secrets are never stored in plain text.
+- **Field-level Hashing**: Optional hashing (e.g., SHA-256) is available for identifiers or anonymized fields when needed, especially for analytics or telemetry pipelines.
+- **HTTPS Assumption**: All deployments are behind HTTPS by default, ensuring encrypted transit of all payloads.
+
+---
+
+## 🧩 Extensibility Roadmap
+-    Robust Unit and integration test
+- ⏰ WebSocket-based real-time updates for collaborative timers
+- 📈 Event pipeline to a centralized analytics database (e.g., ClickHouse or TimescaleDB)
+- 🧠 AI-generated timer suggestions via integration with OpenAI
+- 📬 Email and push notifications based on timer state events
+- 🔌 GraphQL API layer for granular queries and frontend flexibility
+
+---
+
+## 👨‍💻 Author & Architecture
+
+Crafted by **Miracle Adebunmi**, a full-stack engineer passionate about resilient systems, observability, and elegant API design. This project is a testament to modern software engineering, continuous deployment, and event-driven architecture.
+
+> “Chrona is not just a timer — it’s a real-time system observability showcase.”
 
 ---
