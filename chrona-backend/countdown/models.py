@@ -14,6 +14,7 @@ class Timers(Model):
         ('paused', 'Paused'),
         ('expired', 'Expired'),
         ('completed', 'Completed'),
+        ('inactive', 'Inactive')
     ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

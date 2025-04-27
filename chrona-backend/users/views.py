@@ -58,7 +58,7 @@ class PasswordResetRequestView(BaseGenericAPIView):
 
         uid = urlsafe_base64_encode(force_bytes(user.pk))
         token = default_token_generator.make_token(user)
-        reset_link = f'{request.data.get('redirect_base_url')}?uid={uid}&token={token}'
+        reset_link = f"{request.data.get('redirect_base_url')}?uid={uid}&token={token}"
 
         send_mail(
             subject='Password Reset Request',

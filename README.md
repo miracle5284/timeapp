@@ -1,8 +1,4 @@
-Absolutely — here’s the **enhanced final version** of your `README.md`, now including a dedicated **"🔐 Encryption & Hashing"** section that explains your cryptographic design choices and usage. This version preserves your strong technical voice and sharp architectural focus:
 
----
-
-```markdown
 # 🕒 Chrona Backend
 
 Chrona is a modern, production-ready countdown timer backend built with **Python**, **Django REST Framework**, and a supporting microservice ecosystem. Designed with precision, scalability, and observability in mind, Chrona delivers real-time countdown tracking, persistent session recovery, and cross-platform synchronization.
@@ -11,19 +7,20 @@ Chrona is a modern, production-ready countdown timer backend built with **Python
 
 ## ⚙️ Technology Stack
 
-| Layer            | Technology                                                                 |
-|------------------|----------------------------------------------------------------------------|
-| **Language**     | Python 3.11                                                                |
-| **Framework**    | Django 5.0, Django REST Framework                                           |
-| **Authentication** | JWT (via SimpleJWT), OAuth2 (via django-allauth, dj-rest-auth)           |
-| **Queue**        | Celery + Redis (for async task queuing)                                   |
-| **Database**     | PostgreSQL                                                                 |
-| **Cache/Broker** | Redis                                                                      |
-| **Logging**      | FastAPI logging microservice + Redis Streams                               |
-| **Monitoring**   | Prometheus, Grafana, Sentry, LogDNA                                         |
-| **Environment**  | Python-Decouple, `.env`-based modular settings (`base.py`, `prod.py`, ...) |
-| **Infrastructure** | Azure Container Apps + Bicep (IaC)                                        |
-| **CI/CD**        | GitHub Actions (PR previews, blue-green deploys, test coverage)            |
+| Layer                    | Technology                                                                 |
+|--------------------------|----------------------------------------------------------------------------|
+| **Language**             | Python 3.11                                                                |
+| **Framework**            | Django 5.0, Django REST Framework                                          |
+| **Authentication**       | JWT (via SimpleJWT), OAuth2 (via social-django-auth)                       |
+| **Encryption & Hashing** | Fernet & Argon2                                                            |
+| **Queue**                | Celery + Redis (for async task queuing)                                    |
+| **Database**             | PostgreSQL                                                                 |
+| **Cache/Broker**         | Redis                                                                      |
+| **Logging**              | FastAPI logging microservice + Redis Streams                               |
+| **Monitoring**           | Prometheus, Grafana, Sentry, LogDNA                                        |
+| **Environment**          | Python-Decouple, `.env`-based modular settings (`base.py`, `prod.py`, ...) |
+| **Infrastructure**       | Azure Container Apps + Bicep (IaC)                                         |
+| **CI/CD**                | GitHub Actions (PR previews, blue-green deploys, test coverage)            |
 
 ---
 
@@ -105,6 +102,7 @@ flowchart TD
 ## 🔒 Security Posture
 
 - JWT expiration and refresh workflows handled securely.
+- Encrypt all PII or related PII.
 - Social login integrations via OAuth2 providers.
 - Separation of secrets using `python-decouple`, keeping codebase clean.
 - Input sanitization and DRF serializers guard against payload tampering.
@@ -113,29 +111,41 @@ flowchart TD
 
 ## 🔐 Encryption & Hashing
 
-Chrona leverages **cryptographically sound defaults** and modern hashing techniques for securing sensitive data:
+Chrona leverages **strong encryption** and **secure hashing** to protect all sensitive data both **at rest** and **in transit**:
 
-- **JWT Signing**: Tokens are signed using `HS256`, leveraging a securely stored signing key (`SECRET_KEY`) loaded via environment variables.
-- **Password Hashing**: Django’s `PBKDF2` algorithm (with SHA-256) ensures all user passwords are salted and hashed before storage.
-- **Sensitive Token Storage**: OAuth2 tokens and refresh secrets are never stored in plain text.
-- **Field-level Hashing**: Optional hashing (e.g., SHA-256) is available for identifiers or anonymized fields when needed, especially for analytics or telemetry pipelines.
-- **HTTPS Assumption**: All deployments are behind HTTPS by default, ensuring encrypted transit of all payloads.
+### 🛡️ Token & Password Security
+- **JWT Signing**: Access and refresh tokens are signed using `HS256` with high-entropy keys stored securely in environment variables.
+- **Password Hashing**: Django’s default `PBKDF2` (with SHA-256) algorithm salts and hashes all user passwords before storage.
+
+### 🔐 Field-Level Encryption
+- **Fernet AES Encryption**: Sensitive user fields (e.g., emails, OAuth tokens) are encrypted using `cryptography.Fernet`, providing AES-128 GCM authenticated encryption.
+- **Encrypted Fields**: Custom Django fields (e.g., `EncryptedCharField`, `EncryptedTextField`) are used to encrypt/decrypt transparently when reading/writing to the database.
+- **Per-Environment Keys**: Encryption keys rotate per environment (dev, staging, production) and are never committed to the repository.
+
+### 🔎 Hashing for Analytics & Telemetry
+- **SHA-256 Hashing**: Where anonymization is required (e.g., for analytics or telemetry aggregation), identifiers are hashed securely without storing the raw values.
+- **HMAC Signatures**: Deterministic HMAC signatures can be used when secure lookups are needed on encrypted fields (optional).
+
+### 🛡️ Transport Security
+- **HTTPS Everywhere**: Enforced TLS (HTTPS) on all frontend and backend endpoints to protect against MITM attacks.
 
 ---
 
 ## 🧩 Extensibility Roadmap
--    Robust Unit and integration test
-- ⏰ WebSocket-based real-time updates for collaborative timers
-- 📈 Event pipeline to a centralized analytics database (e.g., ClickHouse or TimescaleDB)
-- 🧠 AI-generated timer suggestions via integration with OpenAI
-- 📬 Email and push notifications based on timer state events
-- 🔌 GraphQL API layer for granular queries and frontend flexibility
+
+- ✅ Robust Unit and integration test suites
+- ⏰ WebSocket-based real-time timer synchronization
+- 📈 Event pipeline to a centralized analytics database (e.g., ClickHouse, TimescaleDB)
+- 🧠 AI-generated timer suggestion engine
+- 📬 Email and push notifications based on timer events
+- 🔌 GraphQL API layer for enhanced client-side querying
 
 ---
 
 ## 👨‍💻 Author & Architecture
 
-Crafted by **Miracle Adebunmi**, a full-stack engineer passionate about resilient systems, observability, and elegant API design. This project is a testament to modern software engineering, continuous deployment, and event-driven architecture.
+Crafted by **Miracle Adebunmi**, a full-stack engineer passionate about resilient systems, observability, and elegant API design.  
+This project is a testament to modern software engineering, continuous deployment, and event-driven architecture.
 
 > “Chrona is not just a timer — it’s a real-time system observability showcase.”
 

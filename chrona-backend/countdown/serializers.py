@@ -6,15 +6,22 @@ from .models import Timers
 
 class TimerValidator:
     """
-    Mixin class that provides validation logic for different timer endpoints:
-    - /start/
-    - /pause/
-    - /completed/
+    Mixin class providing validation logic for different timer actions:
+    - /start/ → Start or resume a timer
+    - /pause/ → Pause a running timer
+    - /completed/ → Mark a timer as completed
+    - /reset/ → Reset a timer to initial inactive state
     """
 
     def validate(self, attrs):
         """
-        Route validation to the appropriate method based on the endpoint.
+        Dispatch validation based on the current endpoint path.
+
+        Args:
+            attrs (dict): Incoming validated attributes.
+
+        Returns:
+            dict: Updated validated attributes.
         """
         if self.context['endpoint'].endswith("pause/"):
             attrs = self.validate_pause(attrs)
@@ -22,11 +29,13 @@ class TimerValidator:
             attrs = self.validate_start(attrs)
         elif self.context['endpoint'].endswith('completed/'):
             attrs = self.validate_completed(attrs)
+        elif self.context['endpoint'].endswith('reset/'):
+            attrs = self.validate_reset(attrs)
         return super().validate(attrs)
 
     def validate_pause(self, attrs):
         """
-        Update timer status to 'paused' and record the paused timestamp.
+        Handle pausing the timer: record paused time and set status to 'paused'.
         """
         timestamp = attrs.pop('timestamp')
         attrs.update({
@@ -38,8 +47,10 @@ class TimerValidator:
 
     def validate_start(self, attrs):
         """
-        Update or initialize timer for starting/resuming countdown.
-        Sets resumed_at and resets pause.
+        Handle starting or resuming the timer:
+        - If new, set `start_at`.
+        - If restarting with different duration, update remaining duration.
+        - Set `resumed_at` and clear any pause.
         """
         timestamp = attrs.pop('timestamp')
 
@@ -61,9 +72,27 @@ class TimerValidator:
         })
         return attrs
 
+    def validate_reset(self, attrs):
+        """
+        Handle resetting the timer back to its initial state:
+        - Clears pause/resume timestamps.
+        - Resets status to 'inactive'.
+        - Resets remaining duration to the full duration.
+        """
+        attrs.update({
+            'paused_at': None,
+            'resumed_at': None,
+            'status': 'inactive',
+            'remaining_duration_seconds': self.instance.duration_seconds,
+        })
+        return attrs
+
     def validate_completed(self, attrs):
         """
-        Mark timer as completed and reset relevant fields.
+        Handle marking the timer as completed:
+        - Set paused_at to now.
+        - Set status to 'completed'.
+        - Zero out remaining duration.
         """
         timestamp = attrs.pop('timestamp')
         attrs.update({
@@ -77,8 +106,8 @@ class TimerValidator:
 
 class TimerSerializer(TimerValidator, serializers.ModelSerializer):
     """
-    Serializer for Timer model. Extends TimerValidator to handle
-    logic specific to start, pause, and complete actions.
+    Serializer for the Timer model, with validation extensions
+    for handling specific timer lifecycle events (start, pause, reset, complete).
     """
 
     name = serializers.CharField(required=False)
@@ -87,26 +116,39 @@ class TimerSerializer(TimerValidator, serializers.ModelSerializer):
 
     class Meta:
         model = Timers
-        exclude = ['user_id']  # user_id is set automatically from request
+        exclude = ['user_id', 'celery_tracking_id']  # user_id will be set during create from the request context
 
     def create(self, validated_data):
         """
-        Attach user from request and create timer.
+        Create a new timer instance, automatically attaching the authenticated user.
+
+        Args:
+            validated_data (dict): Incoming validated data.
+
+        Returns:
+            Timers: Newly created timer instance.
         """
         validated_data['user_id'] = self.context['request'].user
         return super().create(validated_data)
 
     def to_representation(self, instance):
         """
-        Calculate remaining duration dynamically if timer is running.
-        Automatically complete if time is up.
+        Dynamically adjust the representation of the timer:
+        - If the timer is active and not paused, calculate updated remaining time.
+        - If time is exhausted, mark the timer as 'completed' automatically.
+
+        Args:
+            instance (Timers): Timer model instance.
+
+        Returns:
+            dict: Serialized timer data for API response.
         """
         if not instance.paused_at and instance.resumed_at:
             elapsed = (timezone.now() - instance.resumed_at).total_seconds()
-            remaining = instance.remaining_duration_seconds - elapsed
+            instance.remaining_duration_seconds = max(0, instance.remaining_duration_seconds - elapsed)
 
-            if remaining <= 0:
+            if instance.remaining_duration_seconds == 0:
                 instance.status = 'completed'
-                instance.remaining_duration_seconds = 0
                 instance.save()
+
         return super().to_representation(instance)
