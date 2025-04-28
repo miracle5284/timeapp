@@ -7,7 +7,7 @@ from decouple import config
 
 def main():
     """Run administrative tasks."""
-    env = config('DJANGO_ENV')
+    env = config('DJANGO-ENV')
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', f'config.settings.{env}')
     try:
         from django.core.management import execute_from_command_line

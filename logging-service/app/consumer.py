@@ -3,7 +3,7 @@ import json
 import logging
 import redis.asyncio as async_redis
 from redis.exceptions import ConnectionError as RedisConnectionError, TimeoutError
-from .config import REDIS_HOST, REDIS_PORT, LOG_STREAM
+from .config import REDIS_HOST, REDIS_PORT, LOG_STREAM, REDIS_PASSWORD
 from .logdna_logger import send_log_to_logdna
 
 logger = logging.getLogger(__name__)
@@ -12,7 +12,9 @@ async def get_redis_connection():
     try:
         redis_client = async_redis.Redis(
             host=REDIS_HOST, 
-            port=REDIS_PORT, 
+            port=REDIS_PORT,
+            password=REDIS_PASSWORD,
+            ssl=True,
             decode_responses=True,
             socket_timeout=10,
             socket_connect_timeout=10,

@@ -1,4 +1,4 @@
-FROM python:3.10-alpine
+FROM python:3.10-slim
 
 # System deps for Poetry and build
 RUN apk add --no-cache gcc musl-dev libffi-dev python3-dev cargo curl

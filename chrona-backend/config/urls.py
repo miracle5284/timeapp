@@ -16,6 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from utils.urls import urlpatterns as up
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -24,4 +25,5 @@ urlpatterns = [
     path('auth/', include('social_django.urls', namespace='social')),
     path('v2/', include('countdown.urls')),
     path('users/', include('users.urls')),
+    path('misc/', include(up))
 ]

@@ -10,3 +10,8 @@ from django.conf import settings
 @permission_classes([AllowAny])
 def extension_info(request):
     return Response(sub_dict(settings, 'EXTENSION_ID', 'EXTENSION_NAME'))
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def health_check(request):
+    return Response({'status': "ok"})
