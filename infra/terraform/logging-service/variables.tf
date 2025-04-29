@@ -1,0 +1,24 @@
+variable "resource_group_name" {
+  description = "Resource group name for Logging Service"
+  type        = string
+}
+
+variable "logging_service_image" {
+  description = "Docker image for the Logging Service"
+  type        = string
+}
+
+variable "location" {
+  description = "Azure region (e.g., eastus)"
+  type        = string
+}
+
+variable "container_app_env_name" {
+  description = "Azure Container App Environment name"
+  type        = string
+}
+
+variable "app_name" {
+  description = "Backend App name (Django)"
+  type        = string
+}
