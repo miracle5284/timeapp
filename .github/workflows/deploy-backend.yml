@@ -52,10 +52,11 @@ jobs:
           terraform_version: 1.11.4
 
       - name: ✅ Terraform Init and Apply
-        working-directory: ./infra/terraform
+        working-directory: ./infra/terraform/backend
         run: |
           terraform init
           terraform fmt -check
+          terraform plan
           terraform validate
           terraform apply -auto-approve \
             -var "resource_group_name=${{ secrets.RESOURCE_GROUP_NAME }}" \

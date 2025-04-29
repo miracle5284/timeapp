@@ -57,6 +57,7 @@ jobs:
         run: |
           terraform init
           terraform fmt -check
+          terraform plan
           terraform validate
 
       - name: 🚀 Deploy Logging Service with Terraform
