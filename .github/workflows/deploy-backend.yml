@@ -1,0 +1,113 @@
+name: Build and Deploy Chrona Backend
+
+on:
+  push:
+    paths:
+      - 'chrona-backend/**'
+      - 'infra/terraform/**'
+      - '.github/workflows/deploy-backend.yml'
+    branches: [ "develop", "staging" ]
+    tags: [ "*" ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: chrona-backend-prod
+
+    steps:
+      - name: 📦 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🛠️ Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: 🔐 Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🐳 Build and Push Backend Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./chrona-backend
+          push: true
+          tags: ghcr.io/${{ github.repository_owner }}/chrona-backend:latest
+
+      - name: 🔐 Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: ✅ Terraform Init and Apply
+        working-directory: ./infra/terraform
+        run: |
+          terraform init
+          terraform fmt -check
+          terraform validate
+          terraform apply -auto-approve \
+            -var "resource_group_name=${{ secrets.RESOURCE_GROUP_NAME }}" \
+            -var "location=${{ secrets.LOCATION }}" \
+            -var "container_app_env_name=${{ secrets.CONTAINER_APP_ENV_NAME }}" \
+            -var "app_name=${{ secrets.CONTAINER_APP_NAME }}" \
+            -var "backend_image=ghcr.io/${{ github.repository_owner }}/chrona-backend:latest"
+
+      - name: 🔑 Fetch and Inject Vault Secrets into Container App
+        env:
+          VAULT_NAME: ${{ secrets.KEY_VAULT_NAME }}
+          RESOURCE_GROUP_NAME: ${{ secrets.RESOURCE_GROUP_NAME }}
+          CONTAINER_APP_NAME: ${{ secrets.BACKEND_CONTAINER_APP_NAME }}
+        run: |
+          echo "🔎 Fetching secrets from Key Vault..."
+          secrets=$(az keyvault secret list --vault-name "$VAULT_NAME" --query "[].name" -o tsv)
+
+          echo "🚀 Injecting secrets into Container App..."
+          for secret in $secrets
+          do
+            echo "Injecting secret: $secret"
+            az containerapp secret set \
+              --name "$CONTAINER_APP_NAME" \
+              --resource-group "$RESOURCE_GROUP_NAME" \
+              --secrets "$secret='@Microsoft.KeyVault(VaultName=$VAULT_NAME;SecretName=$secret)'"
+          done
+
+      - name: 🔗 Bind Secrets to Environment Variables
+        env:
+          VAULT_NAME: ${{ secrets.KEY_VAULT_NAME }}
+          RESOURCE_GROUP_NAME: ${{ secrets.RESOURCE_GROUP_NAME }}
+          CONTAINER_APP_NAME: ${{ secrets.BACKEND_CONTAINER_APP_NAME }}
+        run: |
+          echo "🔗 Binding secrets to environment variables..."
+          secrets=$(az keyvault secret list --vault-name "$VAULT_NAME" --query "[].name" -o tsv)
+
+          env_args=""
+          for secret in $secrets
+          do
+            env_args="$env_args $secret=secretref:$secret"
+          done
+
+          az containerapp update \
+            --name "$CONTAINER_APP_NAME" \
+            --resource-group "$RESOURCE_GROUP_NAME" \
+            --set-env-vars $env_args
+
+          echo "✅ Environment variables updated."
+
+      - name: 🌐 Output Backend URL
+        env:
+          CONTAINER_APP_NAME: ${{ secrets.BACKEND_CONTAINER_APP_NAME }}
+          RESOURCE_GROUP_NAME: ${{ secrets.RESOURCE_GROUP_NAME }}
+        run: |
+          echo "🔍 Fetching backend service URL..."
+          az containerapp show \
+            --name "$CONTAINER_APP_NAME" \
+            --resource-group "$RESOURCE_GROUP_NAME" \
+            --query properties.configuration.ingress.fqdn \
+            -o tsv

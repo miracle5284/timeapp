@@ -1,0 +1,118 @@
+name: Build and Deploy Logging Service
+
+on:
+  push:
+    paths:
+      - 'logging-service/**'
+      - 'infra/terraform/logging-service/**'
+      - '.github/workflows/deploy-logging-service.yml'
+    branches: [ "develop", "staging" ]
+    tags: [ "*" ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: logging-service-prod
+
+    steps:
+      - name: 📦 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🛠️ Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: 🔐 Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🐳 Build and Push Logging Service Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./logging-service
+          dockerfile: ./logging-service/Dockerfile
+          push: true
+          tags: ghcr.io/${{ github.repository_owner }}/chrona-logging-service:latest
+
+      - name: 🔐 Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: ✅ Terraform Format & Validate
+        working-directory: ./infra/terraform/logging-service
+        run: |
+          terraform init
+          terraform fmt -check
+          terraform validate
+
+      - name: 🚀 Deploy Logging Service with Terraform
+        working-directory: ./infra/terraform/logging-service
+        run: |
+          terraform apply -auto-approve \
+            -var "resource_group_name=${{ secrets.RESOURCE_GROUP_NAME }}" \
+            -var "container_app_env_name=${{ secrets.CONTAINER_APP_ENV_NAME }}" \
+            -var "app_name=${{ secrets.CONTAINER_APP_NAME }}" \
+            -var "logging_service_image=ghcr.io/${{ github.repository_owner }}/chrona-logging-service:latest" \
+            -var "key_vault_name=${{ secrets.KEY_VAULT_NAME }}"
+
+      - name: 🔑 Fetch and Inject Vault Secrets into Container App
+        env:
+          VAULT_NAME: ${{ secrets.KEY_VAULT_NAME }}
+          RESOURCE_GROUP_NAME: ${{ secrets.RESOURCE_GROUP_NAME }}
+          CONTAINER_APP_NAME: ${{ secrets.LOGGING_CONTAINER_APP_NAME }}
+        run: |
+          echo "🔎 Fetching secrets from Key Vault..."
+          secrets=$(az keyvault secret list --vault-name "$VAULT_NAME" --query "[].name" -o tsv)
+
+          echo "🚀 Injecting secrets into Container App..."
+          for secret in $secrets
+          do
+            echo "Injecting secret: $secret"
+            az containerapp secret set \
+              --name "$CONTAINER_APP_NAME" \
+              --resource-group "$RESOURCE_GROUP_NAME" \
+              --secrets "$secret=@Microsoft.KeyVault(VaultName=$VAULT_NAME;SecretName=$secret)"
+          done
+
+      - name: 🔗 Bind Secrets to Environment Variables
+        env:
+          VAULT_NAME: ${{ secrets.KEY_VAULT_NAME }}
+          RESOURCE_GROUP_NAME: ${{ secrets.RESOURCE_GROUP_NAME }}
+          CONTAINER_APP_NAME: ${{ secrets.LOGGING_CONTAINER_APP_NAME }}
+        run: |
+          echo "🔗 Binding secrets to environment variables..."
+          secrets=$(az keyvault secret list --vault-name "$VAULT_NAME" --query "[].name" -o tsv)
+
+          env_args=""
+          for secret in $secrets
+          do
+            env_args="$env_args $secret=secretref:$secret"
+          done
+
+          az containerapp update \
+            --name "$CONTAINER_APP_NAME" \
+            --resource-group "$RESOURCE_GROUP_NAME" \
+            --set-env-vars $env_args
+
+          echo "✅ Environment variables updated."
+
+      - name: 🌐 Output Logging Service URL
+        env:
+          CONTAINER_APP_NAME: ${{ secrets.LOGGING_CONTAINER_APP_NAME }}
+          RESOURCE_GROUP_NAME: ${{ secrets.RESOURCE_GROUP_NAME }}
+        run: |
+          echo "🔍 Fetching container app public URL..."
+          az containerapp show \
+            --name "$CONTAINER_APP_NAME" \
+            --resource-group "$RESOURCE_GROUP_NAME" \
+            --query properties.configuration.ingress.fqdn \
+            -o tsv
