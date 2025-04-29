@@ -47,6 +47,11 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+      - name: 🧱 Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.11.4
+
       - name: ✅ Terraform Format & Validate
         working-directory: ./infra/terraform/logging-service
         run: |

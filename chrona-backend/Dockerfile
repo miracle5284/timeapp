@@ -1,7 +1,15 @@
 FROM python:3.10-slim
 
 # System deps for Poetry and build
-RUN apk add --no-cache gcc musl-dev libffi-dev python3-dev cargo curl
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    gcc \
+    libffi-dev \
+    python3-dev \
+    cargo \
+    curl \
+ && rm -rf /var/lib/apt/lists/*
+
 
 WORKDIR /app
 RUN mkdir -p /app
