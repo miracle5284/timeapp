@@ -1,0 +1,96 @@
+{% load static %}
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Countdown Timer App</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Countdown Timer">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <link href="{% static 'styles/'|add:style %}" rel="stylesheet">
+    <link href="{% static 'styles/_extension.css' %}" rel="stylesheet">
+      <link rel="icon" type="image/svg+xml" href="{% static 'imgs/clock-circle-svgrepo-com.svg' %}">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js" defer></script>
+
+      <!-- Load global variables -->
+      <script>
+        var AUDIO_URL = "{% static 'audio/clock-alarm-8761.mp3' %}";
+      </script>
+    <script src="{% static 'js/timer.js' %}" defer></script>
+  </head>
+  <body>
+
+    <div id="extensionPrompt">
+      For the best experience, please
+      <span id="installLink" style="display: none;"><a target="_blank">install</a> and activate </span><a target="_blank" id="enableLink" style="display: none;">activate</a>
+      <a id="enableLink" target="_blank" style="display: none;">activate</a> the Timer Keeper Active extension.
+    </div>
+
+    <div class="t-container">
+      <h1>Countdown Timer</h1>
+      <div class="timer-face">
+        <div class="timer-display">
+          {% for key, value in time_maps.items %}
+          <div class="flap">
+            <div class="label">
+              <button
+                type="button"
+                id="{{ key|lower }}PlusBtn"
+                class="btn-icon"
+                onclick="adjustTime('{{ key|lower }}-display', 1)"
+                aria-label="Increase {{ key }}"
+              >
+                <img src="{% static 'imgs/plus-svgrepo-com.svg' %}" alt="Plus icon" />
+              </button>
+              <span class="label-text">{{ key }}</span>
+              <button
+                type="button"
+                id="{{ key|lower }}MinusBtn"
+                class="btn-icon"
+                onclick="adjustTime('{{ key|lower }}-display', -1)"
+                aria-label="Decrease {{ key }}"
+              >
+                <img src="{% static 'imgs/minus-svgrepo-com.svg' %}" alt="Minus icon" />
+              </button>
+            </div>
+            <span
+              contenteditable="true"
+              class="display"
+              id="{{ key|lower }}-display"
+            >{{ value }}</span>
+          </div>
+          {% if not forloop.last %}
+          <span class="colon">:</span>
+          {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+      <div class="controls">
+        <button id="control" class="ctrl-btn" onclick="toggleTimer()">
+          <span id="control-text" class="fade-in">Start</span>
+        </button>
+
+        <button id="reset" class="ctrl-btn" onclick="resetTimer()">Reset</button>
+      </div>
+      <div class="time-up" id="time-up-wrap">
+        {% if time_up %}
+        Time Up!!!
+        {% endif %}
+      </div>
+    </div>
+    <div
+      id="data-container"
+      type="hidden"
+      data-initial="{{ initial_duration }}"
+      data-active="{{ active }}"
+      data-extension-id="{{ EXTENSION_ID }}"
+      
+    ></div>
+    {% csrf_token %}
+    <script src="{% static 'js/_extension.js' %}" defer></script>
+  </body>
+</html>
