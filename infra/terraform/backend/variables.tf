@@ -14,7 +14,7 @@ variable "container_app_env_name" {
 }
 
 variable "app_name" {
-  description = "Backend App name (Django)"
+  description = "App name"
   type        = string
 }
 

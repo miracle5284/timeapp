@@ -51,7 +51,7 @@ jobs:
         with:
           terraform_version: 1.11.4
 
-      - name: ✅ Terraform Init and Apply
+      - name: ✅ Terraform Init
         working-directory: ./infra/terraform/backend
         run: |
           terraform init \
@@ -64,7 +64,13 @@ jobs:
         working-directory: ./infra/terraform/backend
         run: |
           echo "Running Terraform Plan..."
-          terraform plan -refresh=false -no-color
+          terraform plan -no-color \
+            -var "resource_group_name=${{ secrets.RESOURCE_GROUP_NAME }}" \
+            -var "location=${{ secrets.LOCATION }}" \
+            -var "container_app_env_name=${{ secrets.CONTAINER_APP_ENV_NAME }}" \
+            -var "app_name=${{ secrets.CONTAINER_APP_NAME }}" \
+            -var "backend_image=ghcr.io/${{ github.repository_owner }}/chrona-backend:latest"
+
 
       - name: ✅ Terraform Apply
         working-directory: ./infra/terraform/backend
