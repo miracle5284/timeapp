@@ -54,10 +54,15 @@ jobs:
       - name: ✅ Terraform Init and Apply
         working-directory: ./infra/terraform/backend
         run: |
-          terraform init
+          terraform init \
+            -backend-config="resource_group_name=${{ secrets.RESOURCE_GROUP_NAME }}" \
+            -backend-config="storage_account_name=${{ secrets.STORAGE_ACCOUNT_NAME }}" \
+            -backend-config="container_name=${{ secrets.STORAGE_CONTAINER_NAME }}" \
+            -backend-config="key=${{ secrets.TFSTATE_KEY }}"
           terraform fmt -check
-          terraform plan
           terraform validate
+          echo "Running Terraform Plan..."
+          terraform plan -no-color
           terraform apply -auto-approve \
             -var "resource_group_name=${{ secrets.RESOURCE_GROUP_NAME }}" \
             -var "location=${{ secrets.LOCATION }}" \
@@ -69,7 +74,7 @@ jobs:
         env:
           VAULT_NAME: ${{ secrets.KEY_VAULT_NAME }}
           RESOURCE_GROUP_NAME: ${{ secrets.RESOURCE_GROUP_NAME }}
-          CONTAINER_APP_NAME: ${{ secrets.BACKEND_CONTAINER_APP_NAME }}
+          CONTAINER_APP_NAME: ${{ secrets.CONTAINER_APP_NAME }}
         run: |
           echo "🔎 Fetching secrets from Key Vault..."
           secrets=$(az keyvault secret list --vault-name "$VAULT_NAME" --query "[].name" -o tsv)
@@ -88,7 +93,7 @@ jobs:
         env:
           VAULT_NAME: ${{ secrets.KEY_VAULT_NAME }}
           RESOURCE_GROUP_NAME: ${{ secrets.RESOURCE_GROUP_NAME }}
-          CONTAINER_APP_NAME: ${{ secrets.BACKEND_CONTAINER_APP_NAME }}
+          CONTAINER_APP_NAME: ${{ secrets.CONTAINER_APP_NAME }}
         run: |
           echo "🔗 Binding secrets to environment variables..."
           secrets=$(az keyvault secret list --vault-name "$VAULT_NAME" --query "[].name" -o tsv)
@@ -108,7 +113,7 @@ jobs:
 
       - name: 🌐 Output Backend URL
         env:
-          CONTAINER_APP_NAME: ${{ secrets.BACKEND_CONTAINER_APP_NAME }}
+          CONTAINER_APP_NAME: ${{ secrets.CONTAINER_APP_NAME }}
           RESOURCE_GROUP_NAME: ${{ secrets.RESOURCE_GROUP_NAME }}
         run: |
           echo "🔍 Fetching backend service URL..."

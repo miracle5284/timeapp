@@ -52,19 +52,21 @@ jobs:
         with:
           terraform_version: 1.11.4
 
-      - name: ✅ Terraform Format & Validate
+      - name: ✅ Terraform Init and Apply
         working-directory: ./infra/terraform/logging-service
         run: |
-          terraform init
+          terraform init \
+            -backend-config="resource_group_name=${{ secrets.RESOURCE_GROUP_NAME }}" \
+            -backend-config="storage_account_name=${{ secrets.STORAGE_ACCOUNT_NAME }}" \
+            -backend-config="container_name=${{ secrets.STORAGE_CONTAINER_NAME }}" \
+            -backend-config="key=${{ secrets.TFSTATE_KEY }}"
           terraform fmt -check
-          terraform plan
           terraform validate
-
-      - name: 🚀 Deploy Logging Service with Terraform
-        working-directory: ./infra/terraform/logging-service
-        run: |
+          echo "Running Terraform Plan..."
+          terraform plan -no-color
           terraform apply -auto-approve \
             -var "resource_group_name=${{ secrets.RESOURCE_GROUP_NAME }}" \
+            -var "location=${{ secrets.LOCATION }}" \
             -var "container_app_env_name=${{ secrets.CONTAINER_APP_ENV_NAME }}" \
             -var "app_name=${{ secrets.CONTAINER_APP_NAME }}" \
             -var "logging_service_image=ghcr.io/${{ github.repository_owner }}/chrona-logging-service:latest" \
@@ -74,7 +76,7 @@ jobs:
         env:
           VAULT_NAME: ${{ secrets.KEY_VAULT_NAME }}
           RESOURCE_GROUP_NAME: ${{ secrets.RESOURCE_GROUP_NAME }}
-          CONTAINER_APP_NAME: ${{ secrets.LOGGING_CONTAINER_APP_NAME }}
+          CONTAINER_APP_NAME: ${{ secrets.CONTAINER_APP_NAME }}
         run: |
           echo "🔎 Fetching secrets from Key Vault..."
           secrets=$(az keyvault secret list --vault-name "$VAULT_NAME" --query "[].name" -o tsv)
@@ -86,14 +88,14 @@ jobs:
             az containerapp secret set \
               --name "$CONTAINER_APP_NAME" \
               --resource-group "$RESOURCE_GROUP_NAME" \
-              --secrets "$secret=@Microsoft.KeyVault(VaultName=$VAULT_NAME;SecretName=$secret)"
+              --secrets "$secret='@Microsoft.KeyVault(VaultName=$VAULT_NAME;SecretName=$secret)'"
           done
 
       - name: 🔗 Bind Secrets to Environment Variables
         env:
           VAULT_NAME: ${{ secrets.KEY_VAULT_NAME }}
           RESOURCE_GROUP_NAME: ${{ secrets.RESOURCE_GROUP_NAME }}
-          CONTAINER_APP_NAME: ${{ secrets.LOGGING_CONTAINER_APP_NAME }}
+          CONTAINER_APP_NAME: ${{ secrets.CONTAINER_APP_NAME }}
         run: |
           echo "🔗 Binding secrets to environment variables..."
           secrets=$(az keyvault secret list --vault-name "$VAULT_NAME" --query "[].name" -o tsv)
@@ -116,7 +118,7 @@ jobs:
           CONTAINER_APP_NAME: ${{ secrets.LOGGING_CONTAINER_APP_NAME }}
           RESOURCE_GROUP_NAME: ${{ secrets.RESOURCE_GROUP_NAME }}
         run: |
-          echo "🔍 Fetching container app public URL..."
+          echo "🔍 Fetching logging service URL..."
           az containerapp show \
             --name "$CONTAINER_APP_NAME" \
             --resource-group "$RESOURCE_GROUP_NAME" \

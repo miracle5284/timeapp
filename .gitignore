@@ -153,3 +153,7 @@ GitHub.sublime-settings
 # PyCharm
 .idea/
 
+**.tfstate
+**.tfstate.backup
+
+/infra/terraform/setup/terraform.tfvars
