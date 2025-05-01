@@ -65,7 +65,7 @@ jobs:
         working-directory: ./infra/terraform/logging-service
         run: |
           echo "Running Terraform Plan..."
-          terraform plan -no-color
+          terraform plan -refresh=false -no-color
 
       - name: ✅ Terraform Apply
         working-directory: ./infra/terraform/logging-service
