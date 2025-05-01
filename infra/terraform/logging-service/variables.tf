@@ -19,6 +19,17 @@ variable "container_app_env_name" {
 }
 
 variable "app_name" {
-  description = "Backend App name (Django)"
+  description = "App name"
+  type        = string
+}
+
+variable "registry_password" {
+  description = "GitHub PAT for GHCR (read packages)"
+  type        = string
+  sensitive   = true
+}
+
+variable "registry_username" {
+  description = "GitHub Username for GHCR"
   type        = string
 }

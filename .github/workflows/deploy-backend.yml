@@ -8,11 +8,20 @@ on:
       - '.github/workflows/deploy-backend.yml'
     branches: [ "develop", "staging" ]
     tags: [ "*" ]
+
+  workflow_run:
+    workflows: ["Build and Deploy Logging Service"]
+    types:
+      - completed
   workflow_dispatch:
 
 permissions:
   contents: read
   id-token: write
+
+concurrency:
+  group: chrona-backend
+  cancel-in-progress: false
 
 jobs:
   build-and-deploy:
@@ -64,12 +73,14 @@ jobs:
         working-directory: ./infra/terraform/backend
         run: |
           echo "Running Terraform Plan..."
-          terraform plan -no-color \
+          terraform -refresh=false plan -no-color \
             -var "resource_group_name=${{ secrets.RESOURCE_GROUP_NAME }}" \
             -var "location=${{ secrets.LOCATION }}" \
             -var "container_app_env_name=${{ secrets.CONTAINER_APP_ENV_NAME }}" \
             -var "app_name=${{ secrets.CONTAINER_APP_NAME }}" \
-            -var "backend_image=ghcr.io/${{ github.repository_owner }}/chrona-backend:latest"
+            -var "backend_image=ghcr.io/${{ github.repository_owner }}/chrona-backend:latest" \
+            -var "registry_password=${{ secrets.GHCR_TOKEN }}" \
+            -var "registry_username=${{ github.repository_owner }}"
 
 
       - name: ✅ Terraform Apply
@@ -80,7 +91,9 @@ jobs:
             -var "location=${{ secrets.LOCATION }}" \
             -var "container_app_env_name=${{ secrets.CONTAINER_APP_ENV_NAME }}" \
             -var "app_name=${{ secrets.CONTAINER_APP_NAME }}" \
-            -var "backend_image=ghcr.io/${{ github.repository_owner }}/chrona-backend:latest"
+            -var "backend_image=ghcr.io/${{ github.repository_owner }}/chrona-backend:latest" \
+            -var "registry_password=${{ secrets.GHCR_TOKEN }}" \
+            -var "registry_username=${{ github.repository.owner }}"
 
       - name: 🔑 Fetch and Inject Vault Secrets into Container App
         env:

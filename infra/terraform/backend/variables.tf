@@ -22,3 +22,14 @@ variable "backend_image" {
   description = "Docker image URL for the backend app"
   type        = string
 }
+
+variable "registry_password" {
+  description = "GitHub PAT for GHCR (read packages)"
+  type        = string
+  sensitive   = true
+}
+
+variable "registry_username" {
+  description = "GitHub Username for GHCR"
+  type        = string
+}
