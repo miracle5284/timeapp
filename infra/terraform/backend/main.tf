@@ -6,7 +6,7 @@ resource "azurerm_container_app_environment" "chrona_env" {
 
 resource "azurerm_container_app" "chrona_backend" {
   name                         = var.app_name
-  container_app_environment_id = azurerm_container_app_environment.chrona_env
+  container_app_environment_id = azurerm_container_app_environment.chrona_env.id
   resource_group_name          = var.resource_group_name
   revision_mode                = "Single"
 
@@ -16,16 +16,11 @@ resource "azurerm_container_app" "chrona_backend" {
       image  = var.backend_image
       cpu    = 0.5
       memory = "1Gi"
-      ports {
-        external    = true
-        target_port = 8000
-      }
 
     }
 
-    scale {
-      max_replicas = 3
-    }
+    max_replicas = 3
+
   }
 
   ingress {

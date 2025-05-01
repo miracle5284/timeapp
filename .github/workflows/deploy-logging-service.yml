@@ -52,7 +52,7 @@ jobs:
         with:
           terraform_version: 1.11.4
 
-      - name: ✅ Terraform Init and Apply
+      - name: ✅ Terraform Init
         working-directory: ./infra/terraform/logging-service
         run: |
           terraform init \
@@ -65,7 +65,13 @@ jobs:
         working-directory: ./infra/terraform/logging-service
         run: |
           echo "Running Terraform Plan..."
-          terraform plan -refresh=false -no-color
+          terraform plan -no-color \
+            -var "resource_group_name=${{ secrets.RESOURCE_GROUP_NAME }}" \
+            -var "location=${{ secrets.LOCATION }}" \
+            -var "container_app_env_name=${{ secrets.CONTAINER_APP_ENV_NAME }}" \
+            -var "app_name=${{ secrets.CONTAINER_APP_NAME }}" \
+            -var "logging_service_image=ghcr.io/${{ github.repository_owner }}/chrona-logging-service:latest" \
+            -var "key_vault_name=${{ secrets.KEY_VAULT_NAME }}"
 
       - name: ✅ Terraform Apply
         working-directory: ./infra/terraform/logging-service
