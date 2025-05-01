@@ -23,6 +23,17 @@ resource "azurerm_container_app" "chrona_backend" {
 
   }
 
+  secret {
+    name  = "GHCR_PASSWORD"
+    value = var.registry_password
+  }
+
+  registry {
+    server               = "ghcr.io"
+    username             = var.registry_username
+    password_secret_name = "GHCR_PASSWORD"
+  }
+
   ingress {
     external_enabled = true
     target_port      = 8000
