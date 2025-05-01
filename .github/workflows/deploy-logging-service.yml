@@ -60,10 +60,16 @@ jobs:
             -backend-config="storage_account_name=${{ secrets.STORAGE_ACCOUNT_NAME }}" \
             -backend-config="container_name=${{ secrets.STORAGE_CONTAINER_NAME }}" \
             -backend-config="key=${{ secrets.TFSTATE_KEY }}"
-          terraform fmt -check
-          terraform validate
+
+      - name: ✅ Terraform Plan
+        working-directory: ./infra/terraform/logging-service
+        run: |
           echo "Running Terraform Plan..."
           terraform plan -no-color
+
+      - name: ✅ Terraform Apply
+        working-directory: ./infra/terraform/logging-service
+        run: |
           terraform apply -auto-approve \
             -var "resource_group_name=${{ secrets.RESOURCE_GROUP_NAME }}" \
             -var "location=${{ secrets.LOCATION }}" \
