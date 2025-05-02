@@ -118,42 +118,41 @@ jobs:
           
           for secret in $secrets
           do
-            lowercase_secret="${secret,,}"
           
             # Fetch secret value
             value=$(az keyvault secret show --vault-name "$VAULT_NAME" --name "$secret" --query "value" -o tsv)
           
             # Add to secrets_args (quote value to handle spaces/special chars)
-            secrets_args="$secrets_args $lowercase_secret=$value"
+            secrets_args="$secrets_args $secret=$value"
           done
           
           echo "🚀 Injecting secrets into Container App in batch..."
-          az containerapp secret set \
-            --name "$CONTAINER_APP_NAME" \
-            --resource-group "$RESOURCE_GROUP_NAME" \
-            --secrets $secrets_args
-
-      - name: 🔗 Bind Secrets to Environment Variables
-        env:
-          VAULT_NAME: ${{ secrets.KEY_VAULT_NAME }}
-          RESOURCE_GROUP_NAME: ${{ secrets.RESOURCE_GROUP_NAME }}
-          CONTAINER_APP_NAME: ${{ secrets.CONTAINER_APP_NAME }}
-        run: |
-          echo "🔗 Binding secrets to environment variables..."
-          existing_secrets=$(az containerapp secret list --name "$CONTAINER_APP_NAME" --resource-group "$RESOURCE_GROUP_NAME" --query "[].name" -o tsv)
-          
-          env_args=""
-          for secret in $existing_secrets
-          do
-            env_args="$env_args $secret=secretref:$secret"
-          done
-          
           az containerapp update \
             --name "$CONTAINER_APP_NAME" \
             --resource-group "$RESOURCE_GROUP_NAME" \
-            --set-env-vars $env_args
-        
-          echo "✅ Environment variables updated."
+            --set-env-vars $secrets_args
+
+#      - name: 🔗 Bind Secrets to Environment Variables
+#        env:
+#          VAULT_NAME: ${{ secrets.KEY_VAULT_NAME }}
+#          RESOURCE_GROUP_NAME: ${{ secrets.RESOURCE_GROUP_NAME }}
+#          CONTAINER_APP_NAME: ${{ secrets.CONTAINER_APP_NAME }}
+#        run: |
+#          echo "🔗 Binding secrets to environment variables..."
+#          existing_secrets=$(az containerapp secret list --name "$CONTAINER_APP_NAME" --resource-group "$RESOURCE_GROUP_NAME" --query "[].name" -o tsv)
+#
+#          env_args=""
+#          for secret in $existing_secrets
+#          do
+#            env_args="$env_args $secret=secretref:$secret"
+#          done
+#
+#          az containerapp update \
+#            --name "$CONTAINER_APP_NAME" \
+#            --resource-group "$RESOURCE_GROUP_NAME" \
+#            --set-env-vars $env_args
+#
+#          echo "✅ Environment variables updated."
 
       - name: 🌐 Output Backend URL
         env:
