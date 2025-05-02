@@ -1,6 +1,5 @@
 data "azurerm_container_app_environment" "chrona_env" {
   name                = var.container_app_env_name
-  location            = var.location
   resource_group_name = var.resource_group_name
 }
 
@@ -33,9 +32,10 @@ resource "azurerm_container_app" "logging_service" {
 
 
   ingress {
-    external_enabled = true
-    target_port      = 7000
-    transport        = "auto"
+    external_enabled           = true
+    target_port                = 7000
+    transport                  = "auto"
+    allow_insecure_connections = false
 
     traffic_weight {
       latest_revision = true
