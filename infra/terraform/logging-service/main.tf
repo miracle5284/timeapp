@@ -21,14 +21,14 @@ resource "azurerm_container_app" "logging_service" {
 
 
   secret {
-    name  = "GHCR_PASSWORD"
+    name  = "ghcr-password"
     value = var.registry_password
   }
 
   registry {
     server               = "ghcr.io"
     username             = var.registry_username
-    password_secret_name = "GHCR_PASSWORD"
+    password_secret_name = "ghcr-password"
   }
 
 
@@ -36,5 +36,10 @@ resource "azurerm_container_app" "logging_service" {
     external_enabled = true
     target_port      = 7000
     transport        = "auto"
+
+    traffic_weight {
+      latest_revision = true
+      percentage      = 100
+    }
   }
 }

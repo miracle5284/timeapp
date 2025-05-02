@@ -24,14 +24,14 @@ resource "azurerm_container_app" "chrona_backend" {
   }
 
   secret {
-    name  = "GHCRPASSWORD"
+    name  = "ghcr-password"
     value = var.registry_password
   }
 
   registry {
     server               = "ghcr.io"
     username             = var.registry_username
-    password_secret_name = "GHCRPASSWORD"
+    password_secret_name = "ghcr-password"
   }
 
   ingress {
