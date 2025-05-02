@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 import asyncio
 import logging
-from app.consumer import consume_logs
+from .consumer import consume_logs
 from contextlib import asynccontextmanager
 from prometheus_client import generate_latest, Counter
 from starlette.responses import PlainTextResponse
