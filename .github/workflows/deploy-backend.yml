@@ -113,16 +113,21 @@ jobs:
           echo "🔎 Fetching secrets from Key Vault..."
           secrets=$(az keyvault secret list --vault-name "$VAULT_NAME" --query "[].name" -o tsv)
           
-          echo "Preparing secret injection..."
+          echo "🚀 Preparing secrets injection..."
           secrets_args=""
           
           for secret in $secrets
           do
             lowercase_secret="${secret,,}"
-            secrets_args="$secrets_args $lowercase_secret='@Microsoft.KeyVault(VaultName=$VAULT_NAME;SecretName=$secret)'"
+          
+            # Fetch secret value
+            value=$(az keyvault secret show --vault-name "$VAULT_NAME" --name "$secret" --query "value" -o tsv)
+          
+            # Add to secrets_args (quote value to handle spaces/special chars)
+            secrets_args="$secrets_args $lowercase_secret='$value'"
           done
           
-          echo "Injecting all secrets in single batch..."
+          echo "🚀 Injecting secrets into Container App in batch..."
           az containerapp secret set \
             --name "$CONTAINER_APP_NAME" \
             --resource-group "$RESOURCE_GROUP_NAME" \
