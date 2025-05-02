@@ -87,7 +87,6 @@ jobs:
             -var "container_app_env_name=${{ secrets.CONTAINER_APP_ENV_NAME }}" \
             -var "app_name=${{ secrets.CONTAINER_APP_NAME }}" \
             -var "logging_service_image=ghcr.io/${{ github.repository_owner }}/chrona-logging-service:latest" \
-            -var "key_vault_name=${{ secrets.KEY_VAULT_NAME }}" \
             -var "registry_password=${{ secrets.GHCR_TOKEN }}" \
             -var "registry_username=${{ github.repository_owner }}"
 
