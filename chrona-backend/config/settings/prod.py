@@ -7,7 +7,7 @@ DEBUG = config('DEBUG', cast=bool, default=False)
 ALLOWED_HOSTS = config('ALLOWED-HOSTS'.lower(), cast=Csv())
 # CSRF_TRUSTED_ORIGINS = ALLOWED_HOSTS
 # CORS_ALLOWED_ORIGINS = ALLOWED_HOSTS
-
+print('DDDD', config('POSTGRES-HOST'.lower(), default='localhost'),)
 # Production database config example (PostgreSQL)
 DATABASES = {
     'default': {

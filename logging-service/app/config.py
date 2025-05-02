@@ -2,6 +2,7 @@
 from decouple import config
 
 REDIS_HOST = config("REDIS-HOST".lower(), default="localhost")
+print('RRRR; ', REDIS_HOST)
 REDIS_PORT = config("REDIS-PORT".lower(), default="6379")
 REDIS_PASSWORD = config("REDIS-PASSWORD".lower())
 LOG_STREAM = config("LOG-STREAM".lower(), default="log_events")
