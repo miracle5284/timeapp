@@ -13,6 +13,9 @@ on:
     workflows: ["Build and Deploy Logging Service"]
     types:
       - completed
+    branches:
+      - develop
+      - staging
   workflow_dispatch:
 
 permissions:
@@ -73,7 +76,7 @@ jobs:
         working-directory: ./infra/terraform/backend
         run: |
           echo "Running Terraform Plan..."
-          terraform -refresh=false plan -no-color \
+          terraform plan -refresh=false -no-color \
             -var "resource_group_name=${{ secrets.RESOURCE_GROUP_NAME }}" \
             -var "location=${{ secrets.LOCATION }}" \
             -var "container_app_env_name=${{ secrets.CONTAINER_APP_ENV_NAME }}" \
@@ -93,7 +96,7 @@ jobs:
             -var "app_name=${{ secrets.CONTAINER_APP_NAME }}" \
             -var "backend_image=ghcr.io/${{ github.repository_owner }}/chrona-backend:latest" \
             -var "registry_password=${{ secrets.GHCR_TOKEN }}" \
-            -var "registry_username=${{ github.repository.owner }}"
+            -var "registry_username=${{ github.repository_owner }}"
 
       - name: 🔑 Fetch and Inject Vault Secrets into Container App
         env:
