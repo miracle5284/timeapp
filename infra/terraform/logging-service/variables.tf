@@ -33,24 +33,24 @@ variable "registry_username" {
   description = "GitHub Username for GHCR"
   type        = string
 }
-
-variable "subscription_id" {
-  description = "AZURE Subscription ID"
-  type        = string
-}
-
-variable "tenant_id" {
-  description = "Azure Tenant ID"
-  type        = string
-}
-
-variable "client_id" {
-  description = "Azure Client ID"
-  type        = string
-}
-
-variable "client_secret" {
-  description = "Azure client Secret"
-  type        = string
-  sensitive   = true
-}
+#
+# variable "subscription_id" {
+#   description = "AZURE Subscription ID"
+#   type        = string
+# }
+#
+# variable "tenant_id" {
+#   description = "Azure Tenant ID"
+#   type        = string
+# }
+#
+# variable "client_id" {
+#   description = "Azure Client ID"
+#   type        = string
+# }
+#
+# variable "client_secret" {
+#   description = "Azure client Secret"
+#   type        = string
+#   sensitive   = true
+# }
