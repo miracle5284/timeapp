@@ -117,7 +117,7 @@ jobs:
             value=$(az keyvault secret show --vault-name "$VAULT_NAME" --name "$secret" --query "value" -o tsv)
           
             # Add to secrets_args (quote value to handle spaces/special chars)
-            secrets_args="$secrets_args $lowercase_secret='$value'"
+            secrets_args="$secrets_args $lowercase_secret=$value"
           done
           
           echo "🚀 Injecting secrets into Container App in batch..."
