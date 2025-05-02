@@ -102,11 +102,11 @@ jobs:
           echo "🚀 Injecting secrets into Container App..."
           for secret in $secrets
           do
-            echo "Injecting secret: $secret"
+            lowercase_secret="${secret,,}"
             az containerapp secret set \
               --name "$CONTAINER_APP_NAME" \
               --resource-group "$RESOURCE_GROUP_NAME" \
-              --secrets "$secret='@Microsoft.KeyVault(VaultName=$VAULT_NAME;SecretName=$secret)'"
+              --secrets "$lowercase_secret='@Microsoft.KeyVault(VaultName=$VAULT_NAME;SecretName=$secret)'"
           done
 
       - name: 🔗 Bind Secrets to Environment Variables
@@ -116,19 +116,19 @@ jobs:
           CONTAINER_APP_NAME: ${{ secrets.CONTAINER_APP_NAME }}
         run: |
           echo "🔗 Binding secrets to environment variables..."
-          secrets=$(az keyvault secret list --vault-name "$VAULT_NAME" --query "[].name" -o tsv)
-
+          existing_secrets=$(az containerapp secret list --name "$CONTAINER_APP_NAME" --resource-group "$RESOURCE_GROUP_NAME" --query "[].name" -o tsv)
+          
           env_args=""
-          for secret in $secrets
+          for secret in $existing_secrets
           do
             env_args="$env_args $secret=secretref:$secret"
           done
-
+          
           az containerapp update \
             --name "$CONTAINER_APP_NAME" \
             --resource-group "$RESOURCE_GROUP_NAME" \
             --set-env-vars $env_args
-
+        
           echo "✅ Environment variables updated."
 
       - name: 🌐 Output Logging Service URL

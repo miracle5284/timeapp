@@ -1,4 +1,4 @@
-resource "azurerm_container_app_environment" "chrona_env" {
+data "azurerm_container_app_environment" "chrona_env" {
   name                = var.container_app_env_name
   location            = var.location
   resource_group_name = var.resource_group_name
@@ -6,7 +6,7 @@ resource "azurerm_container_app_environment" "chrona_env" {
 
 resource "azurerm_container_app" "logging_service" {
   name                         = var.app_name
-  container_app_environment_id = azurerm_container_app_environment.chrona_env.id
+  container_app_environment_id = data.azurerm_container_app_environment.chrona_env.id
   resource_group_name          = var.resource_group_name
   revision_mode                = "Single"
 
