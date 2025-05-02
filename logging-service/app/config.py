@@ -1,12 +1,12 @@
 # app/config.py
 from decouple import config
 
-REDIS_HOST = config("REDIS-HOST".lower(), default="localhost")
+REDIS_HOST = config("REDIS_HOST", default="localhost")
 print('RRRR; ', REDIS_HOST)
-REDIS_PORT = config("REDIS-PORT".lower(), default="6379")
-REDIS_PASSWORD = config("REDIS-PASSWORD".lower())
-LOG_STREAM = config("LOG-STREAM".lower(), default="log_events")
-LOGDNA_API_KEY = config("LOGDNA-API-KEY".lower(), default=None)
-SENTRY_DSN = config("SENTRY-DSN".lower(), default=None)
-PROMETHEUS_PUSHGATEWAY_URL = config("PROMETHEUS-PUSHGATEWAY-URL".lower(), default="http://pushgateway:9091")
-LOGDNA_INGESTION_KEY = config("LOGDNA-INGESTION-KEY".lower(), default=None)
+REDIS_PORT = config("REDIS_PORT", default="6379")
+REDIS_PASSWORD = config("REDIS_PASSWORD")
+LOG_STREAM = config("LOG_STREAM", default="log_events")
+LOGDNA_API_KEY = config("LOGDNA_API_KEY", default=None)
+SENTRY_DSN = config("SENTRY_DSN", default=None)
+PROMETHEUS_PUSHGATEWAY_URL = config("PROMETHEUS_PUSHGATEWAY_URL", default="http://pushgateway:9091")
+LOGDNA_INGESTION_KEY = config("LOGDNA_INGESTION_KEY", default=None)

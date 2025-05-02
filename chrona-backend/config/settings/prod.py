@@ -4,19 +4,19 @@ from .base import *
 
 DEBUG = config('DEBUG', cast=bool, default=False)
 
-ALLOWED_HOSTS = config('ALLOWED-HOSTS'.lower(), cast=Csv())
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
 # CSRF_TRUSTED_ORIGINS = ALLOWED_HOSTS
 # CORS_ALLOWED_ORIGINS = ALLOWED_HOSTS
-print('DDDD', config('POSTGRES-HOST'.lower(), default='localhost'),)
+print('DDDD', config('POSTGRES_HOST', default='localhost'),)
 # Production database config example (PostgreSQL)
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('POSTGRES-DB'.lower()),
-        'USER': config('POSTGRES-USER'.lower()),
-        'PASSWORD': config('POSTGRES-PASSWORD'.lower()),
-        'HOST': config('POSTGRES-HOST'.lower(), default='localhost'),
-        'PORT': config('POSTGRES-PORT'.lower(), default='5432'),
+        'NAME': config('POSTGRES_DB'),
+        'USER': config('POSTGRES_USER'),
+        'PASSWORD': config('POSTGRES_PASSWORD'),
+        'HOST': config('POSTGRES_HOST', default='localhost'),
+        'PORT': config('POSTGRES_PORT', default='5432'),
     }
 }
 
@@ -48,9 +48,9 @@ timer_static = BASE_DIR / 'chrona' / 'static'
 if timer_static.exists():
     STATICFILES_DIRS.append(timer_static)
 
-REDIS_HOST = config('REDIS-HOST'.lower(), default='localhost')
-REDIS_PORT = config('REDIS-PORT'.lower(), default='6379')
-REDIS_PASSWORD = config('REDIS-PASSWORD'.lower())
+REDIS_HOST = config('REDIS_HOST', default='localhost')
+REDIS_PORT = config('REDIS_PORT', default='6379')
+REDIS_PASSWORD = config('REDIS_PASSWORD')
 
 
 

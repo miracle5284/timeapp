@@ -20,9 +20,9 @@ import utils.django_meta_patch
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 CONFIG_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = config('SECRET-KEY'.lower(), default='unsafe-secret-key')
-DEBUG = config('DEBUG'.lower(), default=False, cast=bool)
-ALLOWED_HOSTS = config('ALLOWED-HOSTS'.lower(), cast=Csv, default='127.0.0.1,localhost')
+SECRET_KEY = config('SECRET_KEY', default='unsafe-secret-key')
+DEBUG = config('DEBUG', default=False, cast=bool)
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv, default='127.0.0.1,localhost')
 
 
 # Quick-start development settings - unsuitable for production
@@ -30,12 +30,12 @@ ALLOWED_HOSTS = config('ALLOWED-HOSTS'.lower(), cast=Csv, default='127.0.0.1,loc
 
 # SECURITY WARNING: keep the secret key used in production secret!
 
-EXTENSION_ID = config('EXTENSION-ID'.lower(), default="")
-EXTENSION_NAME = config('EXTENSION-NAME'.lower(), default="")
-CORS_ALLOWED_ORIGINS = config('CORS-ALLOWED-ORIGINS'.lower()).split(',')
+EXTENSION_ID = config('EXTENSION_ID', default="")
+EXTENSION_NAME = config('EXTENSION_NAME', default="")
+CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS').split(',')
 CORS_ALLOW_CREDENTIALS = True
 
-BASE_URL = config("BASE-URL".lower())
+BASE_URL = config("BASE_URL")
 
 SESSION_COOKIE_SAMESITE = "None"
 SESSION_COOKIE_SECURE = True
@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     'timer',
     'countdown',
     'users',
+    # 'stopwatch',
 
 
     # Third Party
@@ -180,10 +181,10 @@ DATABASES = {
 
 
 # Cloud Config
-AWS_ACCESS_KEY_ID = config('AWS-ACCESS-KEY-ID'.lower())
-AWS_SECRET_ACCESS_KEY = config('AWS-SECRET-ACCESS-KEY'.lower())
-AWS_STORAGE_BUCKET_NAME = config('AWS-STORAGE-BUCKET-NAME'.lower())
-AWS_REGION_NAME = config('AWS-REGION-NAME'.lower())
+AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME')
+AWS_REGION_NAME = config('AWS_REGION_NAME')
 AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
 AWS_S3_FILE_OVERWRITE = False
 
@@ -266,8 +267,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'users.User'
 
 # Social Auth Settings
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = config("SOCIAL-AUTH-GOOGLE-CLIENT-ID".lower())
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = config("SOCIAL-AUTH-GOOGLE-SECRET".lower())
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = config("SOCIAL_AUTH_GOOGLE_CLIENT_ID")
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = config("SOCIAL_AUTH_GOOGLE_SECRET")
 SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
     'https://www.googleapis.com/auth/userinfo.email',
     'https://www.googleapis.com/auth/userinfo.profile',
@@ -318,21 +319,21 @@ LOGIN_REDIRECT_URL = "/"  # Adjust if needed
 LOGOUT_REDIRECT_URL = "/"
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = config('SMTP-HOST'.lower())
-EMAIL_PORT = config('EMAIL-PORT'.lower(), cast=int, default=587)
-EMAIL_USE_TLS = config('EMAIL-USE-TLS'.lower(), cast=bool, default=True)
-EMAIL_HOST_USER = config('SMTP-USER'.lower())
-EMAIL_HOST_PASSWORD = config('SMTP-PASSWORD'.lower())
-DEFAULT_FROM_EMAIL = config('DEFAULT-FROM-EMAIL'.lower(), default='webmaster@localhost')
+EMAIL_HOST = config('SMTP_HOST')
+EMAIL_PORT = config('EMAIL_PORT', cast=int, default=587)
+EMAIL_USE_TLS = config('EMAIL_USE_TLS', cast=bool, default=True)
+EMAIL_HOST_USER = config('SMTP_USER')
+EMAIL_HOST_PASSWORD = config('SMTP_PASSWORD')
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='webmaster@localhost')
 
-FERNET_ENCRYPTION_KEY = config('F-N--ENCRYPTION'.lower())
-HMAC_KEY = config('HMAC-KEY'.lower())
+FERNET_ENCRYPTION_KEY = config('F_N__ENCRYPTION')
+HMAC_KEY = config('HMAC_KEY')
 
-EXTENSION_ID = config('EXTENSION-ID'.lower())
-EXTENSION_NAME = config('EXTENSION-NAME'.lower())
+EXTENSION_ID = config('EXTENSION_ID')
+EXTENSION_NAME = config('EXTENSION_NAME')
 
 # LOGGING
-LOG_LEVEL = config('LOG-LEVEL'.lower(), default='INFO')
+LOG_LEVEL = config('LOG_LEVEL', default='INFO')
 
 LOGGING = {
     'version': 1,
