@@ -24,6 +24,13 @@ jobs:
     environment:
       name: logging-service-prod
 
+    env:
+      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+      ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+      ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+
+
     steps:
       - name: 📦 Checkout Code
         uses: actions/checkout@v4
@@ -59,7 +66,7 @@ jobs:
       - name: ✅ Terraform Init
         working-directory: ./infra/terraform/logging-service
         run: |
-          terraform init \
+          terraform init -upgrade \
             -backend-config="resource_group_name=${{ secrets.RESOURCE_GROUP_NAME }}" \
             -backend-config="storage_account_name=${{ secrets.STORAGE_ACCOUNT_NAME }}" \
             -backend-config="container_name=${{ secrets.STORAGE_CONTAINER_NAME }}" \
