@@ -98,16 +98,21 @@ jobs:
         run: |
           echo "🔎 Fetching secrets from Key Vault..."
           secrets=$(az keyvault secret list --vault-name "$VAULT_NAME" --query "[].name" -o tsv)
-
-          echo "🚀 Injecting secrets into Container App..."
+          
+          echo "Preparing secret injection..."
+          secrets_args=""
+          
           for secret in $secrets
           do
             lowercase_secret="${secret,,}"
-            az containerapp secret set \
-              --name "$CONTAINER_APP_NAME" \
-              --resource-group "$RESOURCE_GROUP_NAME" \
-              --secrets "$lowercase_secret='@Microsoft.KeyVault(VaultName=$VAULT_NAME;SecretName=$secret)'"
+            secrets_args="$secrets_args $lowercase_secret='@Microsoft.KeyVault(VaultName=$VAULT_NAME;SecretName=$secret)'"
           done
+          
+          echo "Injecting all secrets in single batch..."
+          az containerapp secret set \
+            --name "$CONTAINER_APP_NAME" \
+            --resource-group "$RESOURCE_GROUP_NAME" \
+            --secrets $secrets_args
 
       - name: 🔗 Bind Secrets to Environment Variables
         env:

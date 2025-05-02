@@ -35,8 +35,9 @@ resource "azurerm_container_app" "chrona_backend" {
   }
 
   ingress {
-    external_enabled = true
-    target_port      = 8000
+    external_enabled           = true
+    target_port                = 8000
+    allow_insecure_connections = false
 
     traffic_weight {
       latest_revision = true
