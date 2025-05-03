@@ -128,7 +128,17 @@ class TimerSerializer(TimerValidator, serializers.ModelSerializer):
         Returns:
             Timers: Newly created timer instance.
         """
-        validated_data['user_id'] = self.context['request'].user
+
+        timestamp = validated_data.pop('timestamp')
+
+        validated_data.update({
+            'status': 'active',
+            'paused_at': None,
+            'resumed_at': timestamp,
+            'start_at': timestamp,
+            'user_id': self.context['request'].user,
+            'remaining_duration_seconds': validated_data.get('duration_seconds')
+        })
         return super().create(validated_data)
 
     def to_representation(self, instance):
