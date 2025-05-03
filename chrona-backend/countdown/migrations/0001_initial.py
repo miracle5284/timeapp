@@ -41,7 +41,6 @@ class Migration(migrations.Migration):
                 ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
                 ('name', utils.fields.EncryptedCharField()),
                 ('duration_seconds', models.PositiveIntegerField(default=0)),
-                ('remaining_duration_seconds', models.PositiveIntegerField(default=0)),
                 ('status', models.CharField(choices=[('active', 'Active'), ('paused', 'Paused'), ('expired', 'Expired'), ('completed', 'Completed')], max_length=10)),
                 ('is_recurring', models.BooleanField(default=False)),
                 ('start_at', models.DateTimeField(blank=True, null=True)),
