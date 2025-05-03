@@ -6,7 +6,7 @@ on:
       - 'logging-service/**'
       - 'infra/terraform/logging-service/**'
       - '.github/workflows/deploy-logging-service.yml'
-    branches: [ "develop", "staging" ]
+    branches: [ "develop"]
     tags: [ "*" ]
   workflow_dispatch:
 

@@ -116,7 +116,7 @@ class TimerSerializer(TimerValidator, serializers.ModelSerializer):
 
     class Meta:
         model = Timers
-        exclude = ['user_id', 'celery_tracking_id']  # user_id will be set during create from the request context
+        exclude = ['user_id'] #, 'celery_tracking_id']  # user_id will be set during create from the request context
 
     def create(self, validated_data):
         """
