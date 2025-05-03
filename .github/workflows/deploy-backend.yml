@@ -6,7 +6,7 @@ on:
       - 'chrona-backend/**'
       - 'infra/terraform/**'
       - '.github/workflows/deploy-backend.yml'
-    branches: [ "develop", "staging" ]
+    branches: [ "develop"]
     tags: [ "*" ]
 
   workflow_run:
