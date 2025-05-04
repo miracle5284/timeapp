@@ -1,10 +1,56 @@
-version: '3.4'
+version: '3.9'
 
 services:
-  timer-app:
-    image: timer-app:latest
+  chrona-app:
     build:
-      context: .
-      dockerfile: ./Dockerfile
+      context: ./chrona-backend
+      dockerfile: Dockerfile
     ports:
-      - 8001:8000
+      - "8008:8000"
+    env_file:
+      - ./chrona-backend/.env
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+
+  logging-service:
+    build: ./logging-service
+    ports:
+     - "8001:7000"
+    env_file:
+      - ./logging-service/.env
+    depends_on:
+      - redis
+      - pushgateway
+
+  pushgateway:
+    image: prom/pushgateway
+    ports:
+      - "9091:9091"
+
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./infra/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    depends_on:
+      - pushgateway
+      - chrona-app
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+volumes:
+  grafana_data:

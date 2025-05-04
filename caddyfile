@@ -1,0 +1,6 @@
+https://127.0.0.1:8005 {
+    reverse_proxy 127.0.0.1:8008 {
+        header_up X-Forwarded-Proto https
+        header_up X-Forwarded-Host {host}
+    }
+}
