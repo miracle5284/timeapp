@@ -1,6 +1,7 @@
 import inflection
 from rest_framework import generics
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.views import APIView
 
 from .parsers import CamelCaseJSONParser
 from .renderers import CamelCaseJSONRenderer
@@ -66,6 +67,12 @@ class BaseView:
         model = serializer_cls.Meta.model
         return model.objects.filter(user_id=self.request.user.id)
 
+
+class BaseAPIView(BaseView, APIView):
+    """
+    Base view for DRF API views with camelCase parsing/rendering.
+    """
+    pass
 
 class BaseCreateAPIView(BaseView, generics.CreateAPIView):
     """

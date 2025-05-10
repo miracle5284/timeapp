@@ -76,7 +76,7 @@ MIDDLEWARE = [
     'django_prometheus.middleware.PrometheusBeforeMiddleware',
 
     'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
+    'utils.middlewares.SmartSessionMiddleware',
 #    'whitenoise.middleware.WhiteNoiseMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -89,7 +89,7 @@ MIDDLEWARE = [
 ]
 
 AUTHENTICATION_BACKENDS = [
-    'social_core.backends.google.GoogleOAuth2',
+    'users.backends.auth.google.SecureGoogleOAuth2',
     'django.contrib.auth.backends.ModelBackend',
 ]
 
@@ -126,6 +126,7 @@ REST_FRAMEWORK = {
         # "rest_framework.authentication.TokenAuthentication",
         # You can also add JWT if using something like SimpleJWT
         "utils.auth.JWTAuthentication",
+        "rest_framework.authentication.SessionAuthentication"
     ],
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",  # Default to secure
