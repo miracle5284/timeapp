@@ -12,9 +12,11 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 import os
 from pathlib import Path
 from decouple import config, Csv
-from datetime import timedelta
-import utils.django_meta_patch
 
+from .social_auth_settings import *
+from .session_cors_csrf_settings import *
+from .security_settings import *
+import utils.django_meta_patch
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -32,14 +34,6 @@ ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv, default='127.0.0.1,localhost')
 
 EXTENSION_ID = config('EXTENSION_ID', default="")
 EXTENSION_NAME = config('EXTENSION_NAME', default="")
-CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS').split(',')
-CORS_ALLOW_CREDENTIALS = True
-
-BASE_URL = config("BASE_URL")
-
-SESSION_COOKIE_SAMESITE = "None"
-SESSION_COOKIE_SECURE = True
-SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
 SECURE_REDIRECT_EXEMPT = [
     r"^metrics$"
@@ -267,53 +261,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'users.User'
 
 # Social Auth Settings
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = config("SOCIAL_AUTH_GOOGLE_CLIENT_ID")
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = config("SOCIAL_AUTH_GOOGLE_SECRET")
-SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
-    'https://www.googleapis.com/auth/userinfo.email',
-    'https://www.googleapis.com/auth/userinfo.profile',
-    'openid'
-]
-SOCIAL_AUTH_GOOGLE_OAUTH2_AUTH_EXTRA_ARGUMENTS = {
-    'access_type': 'offline',
-    'prompt': 'consent'
-}
-
-# Redirect URIs
-SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI = '%s/auth/complete/google-oauth2/' % BASE_URL
-SOCIAL_AUTH_ALLOWED_REDIRECT_URIS = [
-    '%s/auth/complete/google-oauth2/' % BASE_URL,
-]
-
-# Session settings for social auth
-SOCIAL_AUTH_SESSION_COOKIE = 'social-auth'
-SOCIAL_AUTH_STORAGE = 'social_django.models.DjangoStorage'
-SOCIAL_AUTH_STRATEGY = 'social_django.strategy.DjangoStrategy'
-SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/'
-SOCIAL_AUTH_LOGIN_ERROR_URL = '/login-error/'
-SOCIAL_AUTH_RAISE_EXCEPTIONS = False
-
-# JWT Settings for social auth
-SOCIAL_AUTH_JWT = {
-    'AUTH_HEADER_TYPES': ('JWT',),
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
-}
-
-# State parameter settings
-SOCIAL_AUTH_FIELDS_STORED_IN_SESSION = ['state']
-SOCIAL_AUTH_PIPELINE = (
-    'social_core.pipeline.social_auth.social_details',
-    'social_core.pipeline.social_auth.social_uid',
-    'social_core.pipeline.social_auth.auth_allowed',
-    'social_core.pipeline.social_auth.social_user',
-    'social_core.pipeline.user.get_username',
-    'social_core.pipeline.user.create_user',
-    'social_core.pipeline.social_auth.associate_user',
-    'social_core.pipeline.social_auth.load_extra_data',
-    'social_core.pipeline.user.user_details',
-    'users.pipeline.issue_jwt_token',
-)
 
 LOGIN_REDIRECT_URL = "/"  # Adjust if needed
 LOGOUT_REDIRECT_URL = "/"

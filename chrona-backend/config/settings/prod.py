@@ -4,10 +4,7 @@ from .base import *
 
 DEBUG = config('DEBUG', cast=bool, default=False)
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
-# CSRF_TRUSTED_ORIGINS = ALLOWED_HOSTS
-# CORS_ALLOWED_ORIGINS = ALLOWED_HOSTS
-print('DDDD', config('POSTGRES_HOST', default='localhost'),)
+
 # Production database config example (PostgreSQL)
 DATABASES = {
     'default': {
@@ -35,14 +32,6 @@ DATABASES = {
 # }
 
 
-# Security
-SECURE_HSTS_SECONDS = 3600
-SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-SECURE_HSTS_PRELOAD = True
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
-
-
 STATICFILES_DIRS = []
 timer_static = BASE_DIR / 'chrona' / 'static'
 if timer_static.exists():
@@ -51,7 +40,6 @@ if timer_static.exists():
 REDIS_HOST = config('REDIS_HOST', default='localhost')
 REDIS_PORT = config('REDIS_PORT', default='6379')
 REDIS_PASSWORD = config('REDIS_PASSWORD')
-
 
 
 CELERY_BROKER_URL = f"redis://{REDIS_HOST}:{REDIS_PORT}/1"
@@ -104,6 +92,5 @@ LOGGING = {
         },
     }
 }
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-SECURE_SSL_REDIRECT = True
+
 
