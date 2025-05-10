@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from utils.fields import EncryptedEmailField, EncryptedCharField
 
 
-class User(AbstractUser, SmartModel):
+class User(SmartModel, AbstractUser):
     """
     Custom User model that uses email as the unique identifier.
     """
@@ -16,7 +16,6 @@ class User(AbstractUser, SmartModel):
     username = EncryptedCharField(max_length=150, unique=True)
 
     account_id = EncryptedCharField(max_length=25, unique=True)
-
 
     objects = SmartUserManager()
 
