@@ -33,6 +33,7 @@ jobs:
           if [[ "$GITHUB_REF" == refs/heads/* ]]; then
             if [ "$REF_NAME" = "develop" ]; then
               echo "ENVIRONMENT="logging-service-dev" >> $GITHUB_OUTPUT
+            fi
           elif [[ "$GITHUB_REF" == refs/tags/* ]]; then
             echo "ENVIRONMENT="logging-service-prod" >> $GITHUB_OUTPUT
           else
@@ -109,7 +110,7 @@ jobs:
             -var "logging_service_image=ghcr.io/${{ github.repository_owner }}/chrona-logging-service:latest" \
             -var "registry_password=${{ secrets.GHCR_TOKEN }}" \
             -var "registry_username=${{ github.repository_owner }}" \
-            -var "var.min_replicas=${{ secrets.MIN_REPLICAS }}"
+            -var "min_replicas=${{ secrets.MIN_REPLICAS }}"
 
       - name: ✅ Terraform Apply
         working-directory: ./infra/terraform/logging-service
@@ -122,7 +123,7 @@ jobs:
             -var "logging_service_image=ghcr.io/${{ github.repository_owner }}/chrona-logging-service:latest" \
             -var "registry_password=${{ secrets.GHCR_TOKEN }}" \
             -var "registry_username=${{ github.repository_owner }}" \
-            -var "var.min_replicas=${{ secrets.MIN_REPLICAS }}"
+            -var "min_replicas=${{ secrets.MIN_REPLICAS }}"
 
       - name: 🔑 Fetch and Inject Vault Secrets into Container App
         env:
