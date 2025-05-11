@@ -9,13 +9,13 @@ on:
     branches: [ "develop"]
     tags: [ "*" ]
 
-  workflow_run:
-    workflows: ["Build and Deploy Logging Service"]
-    types:
-      - completed
-    branches:
-      - develop
-      - staging
+#  workflow_run:
+#    workflows: ["Build and Deploy Logging Service"]
+#    types:
+#      - completed
+#    branches:
+#      - develop
+#      - staging
   workflow_dispatch:
 
 permissions:
@@ -51,6 +51,45 @@ jobs:
       - name: Get Env Variables
         run: |
           echo "Environment: ${{ steps.set-env.outputs.ENVIRONMENT }}"
+
+      - name: Wait for Logging Service to stop running (if triggered)
+        env:
+          GH_TOKEN: ${{ secrets.GHCR_TOKEN }}
+          OWNER: ${{ github.repository_owner }}
+          REPO: ${{ github.event.repository.name }}
+          SHA: ${{ github.sha }}
+        run: |
+          echo "⏳ Checking for matching logging workflow run..."
+
+          run_info=$(gh run list --repo "$OWNER/$REPO" \
+            --workflow "Build and Deploy Logging Service" \
+            --json headSha,status,conclusion -L 10 \
+            | jq -r --arg sha "$SHA" '.[] | select(.headSha == $sha)')
+
+          if [ -z "$run_info" ]; then
+            echo "✅ No matching run found. Proceeding without waiting."
+            exit 0
+          fi
+
+          echo "🔍 Found matching run. Waiting until it's no longer queued or running..."
+
+          for i in {1..30}; do
+            STATUS=$(echo "$run_info" | jq -r '.status')
+            CONCLUSION=$(echo "$run_info" | jq -r '.conclusion')
+            echo "🔄 status=$STATUS, conclusion=$CONCLUSION"
+
+            if [ "$STATUS" != "in_progress" ] && [ "$STATUS" != "queued" ]; then
+              echo "✅ Logging workflow has finished. Proceeding..."
+              break
+            fi
+
+            sleep 10
+
+            run_info=$(gh run list --repo "$OWNER/$REPO" \
+              --workflow "Build and Deploy Logging Service" \
+              --json headSha,status,conclusion -L 10 \
+              | jq -r --arg sha "$SHA" '.[] | select(.headSha == $sha)')
+          done
 
   build-and-deploy:
     runs-on: ubuntu-latest
