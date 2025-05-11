@@ -82,7 +82,7 @@ flowchart TD
 ## 🛡️ Design Philosophy
 
 - **Secure-by-default**: Follows OWASP top 10 compliance; applies token expiration handling, CORS control, HTTPS enforcement, and secrets isolation.
-- **Cloud-Native**: Deploys on **Azure Container Apps**, orchestrated via **Bicep templates** for full Infrastructure-as-Code (IaC).
+- **Cloud-Native**: Deploys on **Azure Container Apps**, orchestrated via **Terraform & Bicep templates** for full Infrastructure-as-Code (IaC).
 - **Zero-downtime**: Blue-green deployments with GitHub Actions ensure smooth rollouts.
 - **Production-Tuned**: Includes Sentry crash monitoring, Prometheus metrics, and Grafana dashboards for operational visibility.
 - **Future-Proof**: Modular design supports plug-and-play architecture for additional event consumers, analytics engines, or notification services.
@@ -115,7 +115,7 @@ Chrona leverages **strong encryption** and **secure hashing** to protect all sen
 
 ### 🛡️ Token & Password Security
 - **JWT Signing**: Access and refresh tokens are signed using `HS256` with high-entropy keys stored securely in environment variables.
-- **Password Hashing**: Django’s default `PBKDF2` (with SHA-256) algorithm salts and hashes all user passwords before storage.
+- **Password Hashing**: Argon2 (based on Blake2b ) algorithm salts and hashes all user passwords before storage.
 
 ### 🔐 Field-Level Encryption
 - **Fernet AES Encryption**: Sensitive user fields (e.g., emails, OAuth tokens) are encrypted using `cryptography.Fernet`, providing AES-128 GCM authenticated encryption.

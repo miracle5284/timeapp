@@ -16,6 +16,8 @@ resource "azurerm_container_app" "logging_service" {
       memory = "0.5Gi"
       name   = var.app_name
     }
+
+    min_replicas = var.min_replicas
   }
 
 
