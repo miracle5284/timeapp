@@ -32,10 +32,10 @@ jobs:
 
           if [[ "$GITHUB_REF" == refs/heads/* ]]; then
             if [ "$REF_NAME" = "develop" ]; then
-              echo "ENVIRONMENT="logging-service-dev" >> $GITHUB_OUTPUT
+              echo "ENVIRONMENT=logging-service-dev" >> $GITHUB_OUTPUT
             fi
           elif [[ "$GITHUB_REF" == refs/tags/* ]]; then
-            echo "ENVIRONMENT="logging-service-prod" >> $GITHUB_OUTPUT
+            echo "ENVIRONMENT=logging-service-prod" >> $GITHUB_OUTPUT
           else
             echo "ENVIRONMENT=unknown" >> $GITHUB_OUTPUT
           fi
