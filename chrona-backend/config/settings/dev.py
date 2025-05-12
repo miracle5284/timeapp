@@ -4,7 +4,7 @@ from .base import *
 
 DEBUG = True
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
+
 print(111, ALLOWED_HOSTS, BASE_DIR, CONFIG_DIR)
 # settings.py
 INSTALLED_APPS += ["django_extensions"]

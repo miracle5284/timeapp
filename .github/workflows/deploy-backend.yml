@@ -9,13 +9,13 @@ on:
     branches: [ "develop"]
     tags: [ "*" ]
 
-  workflow_run:
-    workflows: ["Build and Deploy Logging Service"]
-    types:
-      - completed
-    branches:
-      - develop
-      - staging
+#  workflow_run:
+#    workflows: ["Build and Deploy Logging Service"]
+#    types:
+#      - completed
+#    branches:
+#      - develop
+#      - staging
   workflow_dispatch:
 
 permissions:
@@ -27,10 +27,75 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      ENVIRONMENT: ${{ steps.set-env.outputs.ENVIRONMENT }}
+    steps:
+      - name: Determine Environment
+        id: set-env
+        run: |
+          REF_TYPE="${GITHUB_REF#refs/*/}"
+          REF_NAME="${GITHUB_REF##*/}"
+
+          if [[ "$GITHUB_REF" == refs/heads/* ]]; then
+            if [ "$REF_NAME" = "develop" ]; then
+              echo "ENVIRONMENT=chrona-backend-dev" >> $GITHUB_OUTPUT
+            fi
+          elif [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            echo "ENVIRONMENT=chrona-backend-prod" >> $GITHUB_OUTPUT
+          else
+            echo "ENVIRONMENT=unknown" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Get Env Variables
+        run: |
+          echo "Environment: ${{ steps.set-env.outputs.ENVIRONMENT }}"
+
+      - name: Wait for Logging Service to stop running (if triggered)
+        env:
+          GH_TOKEN: ${{ secrets.GHCR_TOKEN }}
+          OWNER: ${{ github.repository_owner }}
+          REPO: ${{ github.event.repository.name }}
+          SHA: ${{ github.sha }}
+        run: |
+          echo "⏳ Checking for matching logging workflow run..."
+
+          run_info=$(gh run list --repo "$OWNER/$REPO" \
+            --workflow "Build and Deploy Logging Service" \
+            --json headSha,status,conclusion -L 10 \
+            | jq -r --arg sha "$SHA" '.[] | select(.headSha == $sha)')
+
+          if [ -z "$run_info" ]; then
+            echo "✅ No matching run found. Proceeding without waiting."
+            exit 0
+          fi
+
+          echo "🔍 Found matching run. Waiting until it's no longer queued or running..."
+
+          for i in {1..30}; do
+            STATUS=$(echo "$run_info" | jq -r '.status')
+            CONCLUSION=$(echo "$run_info" | jq -r '.conclusion')
+            echo "🔄 status=$STATUS, conclusion=$CONCLUSION"
+
+            if [ "$STATUS" != "in_progress" ] && [ "$STATUS" != "queued" ]; then
+              echo "✅ Logging workflow has finished. Proceeding..."
+              break
+            fi
+
+            sleep 10
+
+            run_info=$(gh run list --repo "$OWNER/$REPO" \
+              --workflow "Build and Deploy Logging Service" \
+              --json headSha,status,conclusion -L 10 \
+              | jq -r --arg sha "$SHA" '.[] | select(.headSha == $sha)')
+          done
+
   build-and-deploy:
     runs-on: ubuntu-latest
+    needs: prepare
     environment:
-      name: chrona-backend-prod
+      name: ${{ needs.prepare.outputs.ENVIRONMENT }}
 
     env:
       ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
@@ -89,7 +154,8 @@ jobs:
             -var "app_name=${{ secrets.CONTAINER_APP_NAME }}" \
             -var "backend_image=ghcr.io/${{ github.repository_owner }}/chrona-backend:latest" \
             -var "registry_password=${{ secrets.GHCR_TOKEN }}" \
-            -var "registry_username=${{ github.repository_owner }}"
+            -var "registry_username=${{ github.repository_owner }}" \
+            -var "min_replicas=${{ secrets.MIN_REPLICAS }}"
 
 
       - name: ✅ Terraform Apply
@@ -102,7 +168,8 @@ jobs:
             -var "app_name=${{ secrets.CONTAINER_APP_NAME }}" \
             -var "backend_image=ghcr.io/${{ github.repository_owner }}/chrona-backend:latest" \
             -var "registry_password=${{ secrets.GHCR_TOKEN }}" \
-            -var "registry_username=${{ github.repository_owner }}"
+            -var "registry_username=${{ github.repository_owner }}" \
+            -var "min_replicas=${{ secrets.MIN_REPLICAS }}"
 
       - name: 🔑 Fetch and Inject Vault Secrets into Container App
         env:

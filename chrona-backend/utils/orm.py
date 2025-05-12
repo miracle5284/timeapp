@@ -54,8 +54,17 @@ class SmartQueryset(models.QuerySet):
         search_fields = getattr(self.model._meta, 'safe_search_fields', [])
 
         for key, value in kwargs.items():
-            if key in search_fields:
-                resolved_kwargs[f"_{key}_hmac"] = compute_hmac(value)
+            # split into (field_name, *lookup_parts)
+            field, *lookups = key.split('__')
+            if field in search_fields:
+                if lookups and lookups[0] not in ('exact', 'iexact'):
+                    raise ValueError(
+                        f"Unsupported lookup '{lookups[0]}' on encrypted field '{field}'. "
+                        "Only exact or iexact are allowed."
+                    )
+                if lookups and lookups[0] == 'iexact':
+                    value = value.lower()
+                resolved_kwargs[f"_{field}_hmac"] = compute_hmac(value)
             else:
                 resolved_kwargs[key] = value
 

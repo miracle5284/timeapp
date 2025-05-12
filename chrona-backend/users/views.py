@@ -1,5 +1,6 @@
 from django.contrib.auth.password_validation import validate_password
 from django.core.mail import send_mail
+from django.urls import reverse
 from django.utils.encoding import force_bytes, force_str
 from rest_framework import status
 from rest_framework.response import Response
@@ -10,7 +11,8 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
 
-from utils.views import BaseCreateAPIView, BaseGenericAPIView, BaseListUpdateAPIView
+from django.conf import settings
+from utils.views import BaseCreateAPIView, BaseGenericAPIView, BaseListUpdateAPIView, BaseAPIView
 from .serializers import UserTokenSerializer, UserSerializer
 
 from .serializers import RegisterUserSerializer
@@ -44,6 +46,7 @@ class LogoutUserView(BaseGenericAPIView):
 class UserTokenView(TokenObtainPairView):
 
     serializer_class = UserTokenSerializer
+
 
 class PasswordResetRequestView(BaseGenericAPIView):
 
@@ -97,6 +100,7 @@ class PasswordResetConfirmView(BaseGenericAPIView):
 
         return Response({'detail': "Password reset successful"}, status=status.HTTP_200_OK)
 
+
 class UserView(BaseListUpdateAPIView):
     """
     API view to retrieve, update or delete a user.
@@ -109,3 +113,49 @@ class UserView(BaseListUpdateAPIView):
 
     def get_object(self):
         return self.request.user
+
+
+class SocialAuthURL(BaseAPIView):
+    """
+    Returns the OAuth login URL for a given social provider.
+
+    This endpoint is called by the frontend to obtain the `begin` URL
+    from `python-social-auth`, e.g., /auth/login/google-oauth2/.
+    """
+
+    permission_classes = [AllowAny]
+
+    def get(self, request, *args, **kwargs):
+        provider = request.query_params.get('provider')
+        backend = settings.BACKEND_MAP.get(provider)
+
+        if not backend:
+            return Response({'detail': 'Invalid provider'}, status=status.HTTP_400_BAD_REQUEST)
+
+        login_path = reverse('social:begin', args=[backend])
+        login_url = request.build_absolute_uri(login_path)
+
+        return Response({'login_url': login_url}, status=status.HTTP_200_OK)
+
+
+class OAuth2TokenView(BaseAPIView):
+    """
+    Called from the OAuth popup window after social-auth login completes.
+
+    Assumes a valid session has already authenticated the user (e.g., via
+    Django session auth middleware). Returns JWT access and refresh tokens
+    for frontend use.
+    """
+
+    permission_classes = [IsAuthenticated]  # Should protect this view!
+
+    def get(self, request, *args, **kwargs):
+        refresh = RefreshToken.for_user(request.user)
+        access_token = str(refresh.access_token)
+        refresh_token = str(refresh)
+
+        return Response({
+            'success': True,
+            'access': access_token,
+            'refresh': refresh_token
+        }, status=status.HTTP_200_OK)
