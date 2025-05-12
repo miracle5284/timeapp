@@ -33,6 +33,12 @@ variable "registry_username" {
   description = "GitHub Username for GHCR"
   type        = string
 }
+
+variable "min_replicas" {
+    description = "Minimum number of replicas for the container app"
+    type        = number
+    default     = 0
+}
 #
 # variable "subscription_id" {
 #   description = "AZURE Subscription ID"

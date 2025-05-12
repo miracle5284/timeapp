@@ -19,10 +19,36 @@ permissions:
   id-token: write
 
 jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      ENVIRONMENT: ${{ steps.set-env.outputs.ENVIRONMENT }}
+    steps:
+      - name: Determine Environment
+        id: set-env
+        run: |
+          REF_TYPE="${GITHUB_REF#refs/*/}"
+          REF_NAME="${GITHUB_REF##*/}"
+
+          if [[ "$GITHUB_REF" == refs/heads/* ]]; then
+            if [ "$REF_NAME" = "develop" ]; then
+              echo "ENVIRONMENT=logging-service-dev" >> $GITHUB_OUTPUT
+            fi
+          elif [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            echo "ENVIRONMENT=logging-service-prod" >> $GITHUB_OUTPUT
+          else
+            echo "ENVIRONMENT=unknown" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Get Env Variables
+        run: |
+          echo "Environment: ${{ steps.set-env.outputs.ENVIRONMENT }}"
+
   build-and-deploy:
     runs-on: ubuntu-latest
+    needs: prepare
     environment:
-      name: logging-service-prod
+      name: ${{ needs.prepare.outputs.ENVIRONMENT }}
 
     env:
       ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
@@ -83,7 +109,8 @@ jobs:
             -var "app_name=${{ secrets.CONTAINER_APP_NAME }}" \
             -var "logging_service_image=ghcr.io/${{ github.repository_owner }}/chrona-logging-service:latest" \
             -var "registry_password=${{ secrets.GHCR_TOKEN }}" \
-            -var "registry_username=${{ github.repository_owner }}"
+            -var "registry_username=${{ github.repository_owner }}" \
+            -var "min_replicas=${{ secrets.MIN_REPLICAS }}"
 
       - name: ✅ Terraform Apply
         working-directory: ./infra/terraform/logging-service
@@ -95,7 +122,8 @@ jobs:
             -var "app_name=${{ secrets.CONTAINER_APP_NAME }}" \
             -var "logging_service_image=ghcr.io/${{ github.repository_owner }}/chrona-logging-service:latest" \
             -var "registry_password=${{ secrets.GHCR_TOKEN }}" \
-            -var "registry_username=${{ github.repository_owner }}"
+            -var "registry_username=${{ github.repository_owner }}" \
+            -var "min_replicas=${{ secrets.MIN_REPLICAS }}"
 
       - name: 🔑 Fetch and Inject Vault Secrets into Container App
         env:

@@ -20,6 +20,7 @@ resource "azurerm_container_app" "chrona_backend" {
     }
 
     max_replicas = 3
+    min_replicas = var.min_replicas
 
   }
 
