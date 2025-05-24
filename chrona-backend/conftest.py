@@ -3,6 +3,7 @@ import subprocess
 import pytest
 import django
 from django.conf import settings
+from django.core.cache import cache
 from rest_framework.test import APIClient
 from users.tests.factories import UserFactory, USER_TEST_PASSWORD
 
@@ -28,6 +29,11 @@ def auth_client(db):
     token = response.data["access"]
     client.credentials(HTTP_AUTHORIZATION=f"Bearer {token}")
     return client, user
+
+# TODO: handle 429 realistically test
+@pytest.fixture(autouse=True)
+def clear_throttle_cache():
+    cache.clear()
 
 def pytest_sessionfinish(session, exitstatus):
     if exitstatus != 0:

@@ -61,6 +61,11 @@ class EncryptedFieldMixin:
         name, path, args, kwargs = super().deconstruct()
         if 'max_length' in kwargs:
             del kwargs['max_length']
+        # Ensure null, blank, unique, etc. are included in migration
+        kwargs['null'] = self.null
+        kwargs['blank'] = self.blank
+        kwargs['unique'] = self.unique
+
         return name, path, args, kwargs
 
 

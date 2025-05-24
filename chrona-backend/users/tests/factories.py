@@ -12,6 +12,7 @@ class UserFactory(factory.django.DjangoModelFactory):
         skip_postgeneration_save = True  # ✅ avoids implicit save warning
 
     email = factory.LazyFunction(lambda: f"{uuid.uuid4().hex}@example.com")
+    username = factory.LazyFunction(lambda: f"user_{uuid.uuid4().hex[:8]}")
     password = USER_TEST_PASSWORD
 
     @classmethod
