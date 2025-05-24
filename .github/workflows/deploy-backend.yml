@@ -116,7 +116,7 @@ jobs:
       - name: 🧪 Run Unit Tests via Poetry
         working-directory: ./chrona-backend
         run: |
-          poetry run test
+          poetry run pytest
 
       - name: 📤 Upload HTML Report
         uses: actions/upload-artifact@v4
