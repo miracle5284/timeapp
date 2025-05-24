@@ -158,6 +158,7 @@ SIMPLE_JWT = {
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
     'UPDATE_LAST_LOGIN': True,
+    'TOKEN_BLACKLIST_ENABLED': True
 }
 INSTALLED_APPS += ['rest_framework_simplejwt.token_blacklist']
 
