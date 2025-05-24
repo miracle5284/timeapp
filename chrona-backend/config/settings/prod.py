@@ -94,3 +94,7 @@ LOGGING = {
 }
 
 
+if "PYTEST_CURRENT_TEST" in os.environ:
+    SECURE_SSL_REDIRECT = False
+
+

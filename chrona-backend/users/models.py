@@ -10,10 +10,10 @@ class User(SmartModel, AbstractUser):
     Custom User model that uses email as the unique identifier.
     """
 
-    email = EncryptedEmailField(unique=True)
+    email = EncryptedEmailField(unique=True, null=False, default=None)
     first_name = EncryptedCharField(max_length=30, blank=True)
     last_name = EncryptedCharField(max_length=30, blank=True)
-    username = EncryptedCharField(max_length=150, unique=True)
+    username = EncryptedCharField(max_length=150, unique=True, null=False, default=None)
 
     account_id = EncryptedCharField(max_length=25, unique=True)
 

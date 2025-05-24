@@ -23,7 +23,7 @@ class TimerViewSet(BaseModelViewSet):
         PATCH endpoint to pause a timer.
         Delegates to the base update method after setting context for validation.
         """
-        return super().update(request, **kwargs)
+        return super().update(request, partial=True, **kwargs)
 
     @action(methods=['patch'], detail=True)
     def start(self, request, **kwargs):
@@ -31,7 +31,7 @@ class TimerViewSet(BaseModelViewSet):
         PATCH endpoint to start or resume a timer.
         Delegates to the base update method after setting context for validation.
         """
-        return super().update(request, **kwargs)
+        return super().update(request, partial=True, **kwargs)
 
     @action(methods=['patch'], detail=True)
     def reset(self, request, **kwargs):
@@ -39,7 +39,7 @@ class TimerViewSet(BaseModelViewSet):
         PATCH endpoint to reset a timer.
         Delegates to the base update method after setting context for validation.
         """
-        return super().update(request, **kwargs)
+        return super().update(request, partial=True, **kwargs)
 
     @action(methods=['patch'], detail=True)
     def completed(self, request, **kwargs):
@@ -47,7 +47,7 @@ class TimerViewSet(BaseModelViewSet):
         PATCH endpoint to mark a timer as completed.
         Delegates to the base update method after setting context for validation.
         """
-        return super().update(request, **kwargs)
+        return super().update(request, partial=True, **kwargs)
 
     def get_serializer_context(self):
         """

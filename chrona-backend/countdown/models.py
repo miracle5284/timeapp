@@ -17,7 +17,7 @@ class Timers(Model):
         ('inactive', 'Inactive')
     ]
 
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     user_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='timers')
     name = EncryptedCharField(max_length=255)
     duration_seconds = models.PositiveIntegerField(default=0)

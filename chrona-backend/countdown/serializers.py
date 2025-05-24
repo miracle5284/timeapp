@@ -110,7 +110,7 @@ class TimerSerializer(TimerValidator, serializers.ModelSerializer):
     for handling specific timer lifecycle events (start, pause, reset, complete).
     """
 
-    name = serializers.CharField(required=False)
+    name = serializers.CharField(required=True)
     timestamp = serializers.DateTimeField(required=True, write_only=True)
     status = serializers.CharField(read_only=True)
 
@@ -128,7 +128,8 @@ class TimerSerializer(TimerValidator, serializers.ModelSerializer):
         Returns:
             Timers: Newly created timer instance.
         """
-
+        if validated_data.get('name') is None:
+            raise serializers.ValidationError("Timer name is required.")
         timestamp = validated_data.pop('timestamp')
 
         validated_data.update({
