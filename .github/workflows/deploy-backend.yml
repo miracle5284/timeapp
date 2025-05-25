@@ -130,10 +130,12 @@ jobs:
         # 🔁 Fetch all secrets dynamically from Key Vault and export
       - name: Export Azure Key Vault secrets to env
         run: |
-          for secret_name in $(az keyvault secret list --vault-name "${{ secrets.AZURE_KEY_VAULT_NAME }}" --query "[].name" -o tsv); do
-            secret_value=$(az keyvault secret show --vault-name "${{ secrets.AZURE_KEY_VAULT_NAME }}" --name "$secret_name" --query "value" -o tsv)
-            echo "Exporting $secret_name"
-            echo "$secret_name=$secret_value" >> $GITHUB_ENV
+          for secret_name in $(az keyvault secret list --vault-name "${{ secrets.KEY_VAULT_NAME }}" --query "[].name" -o tsv); do
+            secret_value=$(az keyvault secret show --vault-name "${{ secrets.KEY_VAULT_NAME }}" --name "$secret_name" --query "value" -o tsv)
+            env_var_name=$(echo "$secret_name" | tr '[:lower:]' '[:upper:]' | tr '-' '_')
+
+            echo "Exporting $env_var_name"
+            echo "$env_var_name=$secret_value" >> $GITHUB_ENV
           done
 
       - name: 🧪 Run Unit Tests via Poetry
@@ -149,7 +151,7 @@ jobs:
 
   build-and-deploy:
     runs-on: ubuntu-latest
-    needs: test
+    needs: [prepare, test]
     environment:
       name: ${{ needs.prepare.outputs.ENVIRONMENT }}
 
@@ -178,7 +180,7 @@ jobs:
         with:
           context: ./chrona-backend
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/chrona-backend-${{ needs.prepare.outputs.ENVIRONMENT }}:latest
+          tags: ghcr.io/${{ github.repository_owner }}/chrona-backend-${{ secrets.IMAGE_NAME }}:latest
 
       - name: 🔐 Azure Login
         uses: azure/login@v2
@@ -208,7 +210,7 @@ jobs:
             -var "location=${{ secrets.LOCATION }}" \
             -var "container_app_env_name=${{ secrets.CONTAINER_APP_ENV_NAME }}" \
             -var "app_name=${{ secrets.CONTAINER_APP_NAME }}" \
-            -var "backend_image=ghcr.io/${{ github.repository_owner }}/chrona-backend:latest" \
+            -var "backend_image=ghcr.io/${{ github.repository_owner }}/chrona-backend-${{ secrets.IMAGE_NAME }}:latest" \
             -var "registry_password=${{ secrets.GHCR_TOKEN }}" \
             -var "registry_username=${{ github.repository_owner }}" \
             -var "min_replicas=${{ secrets.MIN_REPLICAS }}"
@@ -222,7 +224,7 @@ jobs:
             -var "location=${{ secrets.LOCATION }}" \
             -var "container_app_env_name=${{ secrets.CONTAINER_APP_ENV_NAME }}" \
             -var "app_name=${{ secrets.CONTAINER_APP_NAME }}" \
-            -var "backend_image=ghcr.io/${{ github.repository_owner }}/chrona-backend:latest" \
+            -var "backend_image=ghcr.io/${{ github.repository_owner }}/chrona-backend-${{ secrets.IMAGE_NAME }}:latest" \
             -var "registry_password=${{ secrets.GHCR_TOKEN }}" \
             -var "registry_username=${{ github.repository_owner }}" \
             -var "min_replicas=${{ secrets.MIN_REPLICAS }}"
