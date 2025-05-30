@@ -38,6 +38,10 @@ class Timers(Model):
     def __str__(self):
         return f"{self.name} ({self.user_id})"
 
+    @property
+    def is_active(self):
+        return self.status == 'active'
+
 
 class NotificationSettings(Model):
 

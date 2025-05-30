@@ -154,7 +154,7 @@ class TimerSerializer(TimerValidator, serializers.ModelSerializer):
         Returns:
             dict: Serialized timer data for API response.
         """
-        if not instance.paused_at and instance.resumed_at:
+        if instance.status != 'completed' and not instance.paused_at and instance.resumed_at:
             elapsed = (timezone.now() - instance.resumed_at).total_seconds()
             instance.remaining_duration_seconds = max(0, instance.remaining_duration_seconds - elapsed)
 

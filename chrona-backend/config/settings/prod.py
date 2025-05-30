@@ -38,12 +38,12 @@ if timer_static.exists():
     STATICFILES_DIRS.append(timer_static)
 
 REDIS_HOST = config('REDIS_HOST', default='localhost')
-REDIS_PORT = config('REDIS_PORT', default='6379')
-REDIS_PASSWORD = config('REDIS_PASSWORD')
+REDIS_PORT = config('REDIS_PORT', cast=int, default=6379)
+REDIS_PASSWORD = config('REDIS_PASSWORD', '')
 
 
-CELERY_BROKER_URL = f"redis://{REDIS_HOST}:{REDIS_PORT}/1"
-CELERY_RESULT_BACKEND = f"redis://{REDIS_HOST}:{REDIS_PORT}/2"
+CELERY_BROKER_URL = f"{REDIS_HOST}:{REDIS_PORT}/1"
+CELERY_RESULT_BACKEND = f"{REDIS_HOST}:{REDIS_PORT}/2"
 
 
 LOGGING = {

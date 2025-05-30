@@ -25,5 +25,6 @@ urlpatterns = [
     path('auth/', include('social_django.urls', namespace='social')),
     path('v2/', include('countdown.urls')),
     path('users/', include('users.urls')),
-    path('misc/', include(up))
+    path('misc/', include(up)),
+    path('services/notifications/', include('notifications.urls')),
 ]
