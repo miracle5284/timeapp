@@ -34,18 +34,15 @@ class PushSubscriptionView(BaseAPIView):
         data['p256dh'] = data.get('keys', {}).get('p256dh')
         data['auth'] = data.get('keys', {}).get('auth')
 
-        serializer = PushSubscriptionSerializer(data=data)
-        serializer.is_valid(raise_exception=True)
-
-        # Store or update the push subscription
-        PushSubscription.objects.update_or_create(
-            user=user,
-            endpoint=serializer.validated_data['endpoint'],
+        status, _ = PushSubscription.objects.create_or_update(
+            user=user.id,
+            endpoint=data.get('endpoint'),
             defaults={
-                'expiration_time': serializer.validated_data.get('expiration_time'),
-                'p256dh': serializer.validated_data['p256dh'],
-                'auth': serializer.validated_data['auth'],
-            }
+                    'expiration_time': data.get('expiration_time'),
+                    'p256dh': data['p256dh'],
+                    'auth': data['auth'],
+                },
+            serializer_cls=PushSubscriptionSerializer,
         )
 
-        return Response({'status': 'subscription stored'})
+        return Response({'status': 'subscription %s successfully.' % (status and 'created' or 'updated')})

@@ -1,6 +1,6 @@
 from datetime import timedelta
 
-from celery.worker.control import revoke
+from celery import current_app
 from django.db.models.signals import post_save
 from django.utils.timezone import is_naive, make_aware
 from django.dispatch import receiver
@@ -12,6 +12,19 @@ from .tasks import send_timer_complete_email
 
 GRACE_PERIOD = 10  # Extra buffer (in seconds) after timer completion before sending notifications
 
+from django.db.models.signals import pre_save, post_save
+from django.dispatch import receiver
+
+@receiver(pre_save, sender=Timers)
+def timer_status(sender, instance, **kwargs):
+    # TODO: Add unit test for presave and postw
+    if instance.pk:
+        try:
+            instance._prev_instance = sender.objects.get(pk=instance.pk)
+        except sender.DoesNotExist:
+            instance._prev_instance = None
+    else:
+        instance._prev_instance = None
 
 @receiver(post_save, sender=Timers)
 def timer_status_watcher(sender, instance, created, **kwargs):
@@ -30,9 +43,12 @@ def timer_status_watcher(sender, instance, created, **kwargs):
         created (bool): Whether this is a new instance.
         **kwargs: Extra keyword arguments.
     """
-    scheduled_tasks = []
 
-    if instance.is_active:
+    scheduled_tasks = []
+    prev_status = None
+    if not created and hasattr(instance, '_prev_instance') and instance._prev_instance:
+        prev_status = instance._prev_instance.status
+    if instance.is_active and instance.resumed_at:
         if instance.user_id and instance.user_id.email:
             # Calculate the exact notification time
             scheduled_time = instance.resumed_at + timedelta(
@@ -74,7 +90,7 @@ def timer_status_watcher(sender, instance, created, **kwargs):
             # Save both scheduled tasks to the DB
             TaskRegistry.objects.bulk_create(scheduled_tasks)
 
-    elif not instance.is_active:
+    elif prev_status == 'active' and not instance.is_active:
         # If the timer is paused/completed/reset, revoke any existing tasks
         for task in TaskRegistry.objects.filter(
             related_model=instance.__class__.__name__,
@@ -82,6 +98,6 @@ def timer_status_watcher(sender, instance, created, **kwargs):
             is_revoked=False,
             task_type__in=['timer_push_notify', 'timer_complete_email']
         ):
-            revoke(task.task_id, terminate=True)
+            current_app.control.revoke(task.task_id, terminate=True)
             task.is_revoked = True
             task.save()
