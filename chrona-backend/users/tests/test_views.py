@@ -46,9 +46,7 @@ def test_token_login_failure():
         "password": "wrongPassword"
     }
 
-    print('LOGIN URL: ', url)
     response = APIClient().post(url, data, format='json')
-    print('LOGIN URL: ', url, response.status_code, response.data)
     assert response.status_code == 401
     assert 'access' not in response.data
     assert 'refresh' not in response.data
@@ -58,7 +56,6 @@ def test_token_login_failure():
 def test_get_current_user(auth_client):
     client, user = auth_client
     response = client.get('/users/')
-    print('GET USER URL: ', response.status_code, response.data)
     assert response.status_code == 200
     assert response.data['results'][0]['email'] == user.email
     assert response.data['results'][0]['username'] == user.username
@@ -69,7 +66,6 @@ def test_logout(auth_client):
     url = reverse('logout')
     refresh = str(RefreshToken.for_user(user))
     response = client.post(url, {'refresh': refresh}, format='json')
-    print('LOGOUT URL: ', url, response.status_code, response.data)
     assert response.status_code == 205
     assert response.data['detail'] == 'Logout successful'
 
