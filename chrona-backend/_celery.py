@@ -5,7 +5,7 @@ from decouple import config
 
 env = config('DJANGO_ENV')
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', f'config.settings.{env}')
-os.environ.setdefault('FORKED_BY_MULTIPROCESSING', '1')
+# os.environ.setdefault('FORKED_BY_MULTIPROCESSING', '1')
 
 app = Celery('chrona')
 
