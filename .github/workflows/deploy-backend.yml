@@ -192,7 +192,7 @@ jobs:
         with:
           terraform_version: 1.11.4
 
-      - name: ✅ Terraform Init
+      - name: Terraform Init (Backend)
         working-directory: ./infra/terraform/backend
         run: |
           terraform init -upgrade \
@@ -201,7 +201,7 @@ jobs:
             -backend-config="container_name=${{ secrets.STORAGE_CONTAINER_NAME }}" \
             -backend-config="key=${{ secrets.TFSTATE_KEY }}"
 
-      - name: ✅ Terraform Plan
+      - name: Terraform Plan (Backend)
         working-directory: ./infra/terraform/backend
         run: |
           echo "Running Terraform Plan..."
@@ -214,7 +214,6 @@ jobs:
             -var "registry_password=${{ secrets.GHCR_TOKEN }}" \
             -var "registry_username=${{ github.repository_owner }}" \
             -var "min_replicas=${{ secrets.MIN_REPLICAS }}"
-
 
       - name: ✅ Terraform Apply
         working-directory: ./infra/terraform/backend
@@ -293,3 +292,113 @@ jobs:
             --resource-group "$RESOURCE_GROUP_NAME" \
             --query properties.configuration.ingress.fqdn \
             -o tsv
+
+  deploy-celery:
+    runs-on: ubuntu-latest
+    needs: [prepare, build-and-deploy]
+    environment:
+      name: ${{ needs.prepare.outputs.Environment }}
+    env:
+      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+      ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+      ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.11.4
+
+      - name: 🔑 Fetch Redis URL from Key Vault
+        id: get-redis
+        run: |
+          REDIS_URL=$(az keyvault secret show \
+            --vault-name "${{ secrets.KEY_VAULT_NAME }}" \
+            --name "redis-url" \
+            --query "value" -o tsv)
+
+          echo "REDIS_URL=$REDIS_URL" >> $GITHUB_ENV
+
+      - name: Terraform Init (Celery)
+        working-directory: ./infra/terraform/celery-worker
+        run: terraform init -upgrade \
+          -backend-config="resource_group_name=${{ secrets.RESOURCE_GROUP_NAME }}" \
+          -backend-config="storage_account_name=${{ secrets.STORAGE_ACCOUNT_NAME }}" \
+          -backend-config="container_name=${{ secrets.STORAGE_CONTAINER_NAME }}" \
+          -backend-config="key=${{ secrets.CELERY_TFSTATE_KEY }}"
+
+      - name: Terraform Apply (Celery)
+        working-directory: ./infra/terraform/celery-worker
+        run: terraform apply -auto-approve \
+          -var "resource_group_name=${{ secrets.RESOURCE_GROUP_NAME }}" \
+          -var "location=${{ secrets.LOCATION }}" \
+          -var "container_app_env_name=${{ secrets.CONTAINER_APP_ENV_NAME }}" \
+          -var "app_name=${{ secrets.CELERY_CONTAINER_APP_NAME }}" \
+          -var "app_image=ghcr.io/${{ github.repository_owner }}/chrona-backend-${{ secrets.IMAGE_NAME }}:latest" \
+          -var "registry_password=${{ secrets.GHCR_TOKEN }}" \
+          -var "registry_username=${{ github.repository_owner }}" \
+          -var "min_replicas=${{ secrets.MIN_REPLICAS }}" \
+          -var "max_replicas=${{ secrets.CMAX_REPLICAS }}" \
+          -var "list_name=celery" \
+          -var "list_length=1" \
+          -var "redis_url=$REDIS_URL"
+
+      - name: 🔑 Fetch and Inject Vault Secrets into Celery App
+        env:
+          VAULT_NAME: ${{ secrets.KEY_VAULT_NAME }}
+          RESOURCE_GROUP_NAME: ${{ secrets.RESOURCE_GROUP_NAME }}
+          CONTAINER_APP_NAME: ${{ secrets.CELERY_CONTAINER_APP_NAME }}
+        run: |
+          echo "🔎 Fetching secrets from Key Vault..."
+          secrets=$(az keyvault secret list --vault-name "$VAULT_NAME" --query "[].name" -o tsv)
+          
+          echo "🚀 Preparing secrets injection..."
+          secrets_args=""
+          
+          for secret in $secrets
+          do
+          lowercase_secret="${secret,,}"
+          
+          # Fetch secret value
+          value=$(az keyvault secret show --vault-name "$VAULT_NAME" --name "$secret" --query "value" -o tsv)
+          
+          # Add to secrets_args (quote value to handle spaces/special chars)
+          secrets_args="$secrets_args $lowercase_secret=$value"
+          done
+          
+          echo "Injecting all secrets in single batch..."
+          az containerapp secret set \
+          --name "$CONTAINER_APP_NAME" \
+          --resource-group "$RESOURCE_GROUP_NAME" \
+          --secrets $secrets_args
+
+          - name: 🔗 Bind Secrets to Environment Variables
+            env:
+              VAULT_NAME: ${{ secrets.KEY_VAULT_NAME }}
+              RESOURCE_GROUP_NAME: ${{ secrets.RESOURCE_GROUP_NAME }}
+              CONTAINER_APP_NAME: ${{ secrets.CELERY_CONTAINER_APP_NAME }}
+            run: |
+              echo "🔗 Binding secrets to environment variables..."
+              existing_secrets=$(az containerapp secret list --name "$CONTAINER_APP_NAME" --resource-group "$RESOURCE_GROUP_NAME" --query "[].name" -o tsv)
+              
+              env_args=""
+              for secret in $existing_secrets
+              do
+                # Sanitize secret name: replace - with _
+                env_var_name=$(echo "$secret" | tr '-' '_' | tr '[:lower:]' '[:upper:]')
+                env_args="$env_args $env_var_name=secretref:$secret"
+              done
+              
+              az containerapp update \
+                --name "$CONTAINER_APP_NAME" \
+                --resource-group "$RESOURCE_GROUP_NAME" \
+                --set-env-vars $env_args
+              
+              echo "✅ Environment variables updated."
+

@@ -18,7 +18,7 @@ variable "app_name" {
   type        = string
 }
 
-variable "backend_image" {
+variable "app_image" {
   description = "Docker image URL for the backend app"
   type        = string
 }
