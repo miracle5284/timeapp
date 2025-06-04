@@ -1,5 +1,4 @@
 import pytest
-
 from users.tests.factories import UserFactory, USER_TEST_PASSWORD
 
 

@@ -1,7 +1,6 @@
 import io
 import json
 from utils.parsers import CamelCaseJSONParser
-from rest_framework.test import APIRequestFactory
 
 def test_camel_case_parser_conversion():
     parser = CamelCaseJSONParser()

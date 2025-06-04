@@ -1,5 +1,4 @@
 import pytest
-
 from users.serializers import RegisterUserSerializer, UserTokenSerializer, UserSerializer
 from users.tests.factories import UserFactory, USER_TEST_PASSWORD
 

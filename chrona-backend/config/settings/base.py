@@ -40,6 +40,9 @@ SECURE_REDIRECT_EXEMPT = [
 ]
 
 
+# Keys
+VAPID_KEY=config('VAPID_PRIVATE_KEY')
+
 
 # Application definition
 
@@ -56,6 +59,8 @@ INSTALLED_APPS = [
     'timer',
     'countdown',
     'users',
+    'notifications',
+    'task_registry',
     # 'stopwatch',
 
 
