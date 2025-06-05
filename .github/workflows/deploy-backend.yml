@@ -339,7 +339,7 @@ jobs:
           -var "resource_group_name=${{ secrets.RESOURCE_GROUP_NAME }}" \
           -var "location=${{ secrets.LOCATION }}" \
           -var "container_app_env_name=${{ secrets.CONTAINER_APP_ENV_NAME }}" \
-          -var "app_name=${{ secrets.CELERY_CONTAINER_APP_NAME }}" \
+          -var "worker_name=${{ secrets.CELERY_CONTAINER_APP_NAME }}" \
           -var "app_image=ghcr.io/${{ github.repository_owner }}/chrona-backend-${{ secrets.IMAGE_NAME }}:latest" \
           -var "registry_password=${{ secrets.GHCR_TOKEN }}" \
           -var "registry_username=${{ github.repository_owner }}" \
@@ -348,6 +348,7 @@ jobs:
           -var "list_name=celery" \
           -var "list_length=1" \
           -var "redis_url=$REDIS_URL"
+          -var "environment=${{ needs.prepare.outputs.Environment }}"
 
       - name: 🔑 Fetch and Inject Vault Secrets into Celery App
         env:
