@@ -350,7 +350,7 @@ jobs:
             -var "max_replicas=${{ secrets.CMAX_REPLICAS }}" \
             -var "list_name=celery" \
             -var "list_length=1" \
-            -var "redis_url=$REDIS_URL"
+            -var "redis_url=$REDIS_URL" \
             -var "environment=${{ needs.prepare.outputs.Environment }}"
 
       - name: 🔑 Fetch and Inject Vault Secrets into Celery App
