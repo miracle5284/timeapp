@@ -13,7 +13,7 @@ resource "azurerm_container_app" "chrona_backend" {
   template {
     container {
       name   = var.app_name
-      image  = var.app_image
+      image  = var.backend_image
       cpu    = 0.5
       memory = "1Gi"
 
