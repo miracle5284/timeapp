@@ -327,28 +327,31 @@ jobs:
 
       - name: Terraform Init (Celery)
         working-directory: ./infra/terraform/celery-worker
-        run: terraform init -upgrade \
-          -backend-config="resource_group_name=${{ secrets.RESOURCE_GROUP_NAME }}" \
-          -backend-config="storage_account_name=${{ secrets.STORAGE_ACCOUNT_NAME }}" \
-          -backend-config="container_name=${{ secrets.STORAGE_CONTAINER_NAME }}" \
-          -backend-config="key=${{ secrets.CELERY_TFSTATE_KEY }}"
+        run: |
+          terraform init -upgrade \
+            -backend-config="resource_group_name=${{ secrets.RESOURCE_GROUP_NAME }}" \
+            -backend-config="storage_account_name=${{ secrets.STORAGE_ACCOUNT_NAME }}" \
+            -backend-config="container_name=${{ secrets.STORAGE_CONTAINER_NAME }}" \
+            -backend-config="key=${{ secrets.CELERY_TFSTATE_KEY }}"
+
 
       - name: Terraform Apply (Celery)
         working-directory: ./infra/terraform/celery-worker
-        run: terraform apply -auto-approve \
-          -var "resource_group_name=${{ secrets.RESOURCE_GROUP_NAME }}" \
-          -var "location=${{ secrets.LOCATION }}" \
-          -var "container_app_env_name=${{ secrets.CONTAINER_APP_ENV_NAME }}" \
-          -var "worker_name=${{ secrets.CELERY_CONTAINER_APP_NAME }}" \
-          -var "app_image=ghcr.io/${{ github.repository_owner }}/chrona-backend-${{ secrets.IMAGE_NAME }}:latest" \
-          -var "registry_password=${{ secrets.GHCR_TOKEN }}" \
-          -var "registry_username=${{ github.repository_owner }}" \
-          -var "min_replicas=${{ secrets.MIN_REPLICAS }}" \
-          -var "max_replicas=${{ secrets.CMAX_REPLICAS }}" \
-          -var "list_name=celery" \
-          -var "list_length=1" \
-          -var "redis_url=$REDIS_URL"
-          -var "environment=${{ needs.prepare.outputs.Environment }}"
+        run: |
+          terraform apply -auto-approve \
+            -var "resource_group_name=${{ secrets.RESOURCE_GROUP_NAME }}" \
+            -var "location=${{ secrets.LOCATION }}" \
+            -var "container_app_env_name=${{ secrets.CONTAINER_APP_ENV_NAME }}" \
+            -var "worker_name=${{ secrets.CELERY_CONTAINER_APP_NAME }}" \
+            -var "app_image=ghcr.io/${{ github.repository_owner }}/chrona-backend-${{ secrets.IMAGE_NAME }}:latest" \
+            -var "registry_password=${{ secrets.GHCR_TOKEN }}" \
+            -var "registry_username=${{ github.repository_owner }}" \
+            -var "min_replicas=${{ secrets.MIN_REPLICAS }}" \
+            -var "max_replicas=${{ secrets.CMAX_REPLICAS }}" \
+            -var "list_name=celery" \
+            -var "list_length=1" \
+            -var "redis_url=$REDIS_URL"
+            -var "environment=${{ needs.prepare.outputs.Environment }}"
 
       - name: 🔑 Fetch and Inject Vault Secrets into Celery App
         env:
