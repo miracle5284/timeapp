@@ -18,37 +18,33 @@ resource "azurerm_container_app" "chrona_celery_worker" {
       command = ["poetry", "run", "celery", "-A", "config", "worker", "--loglevel=info"]
     }
 
-    scale {
-      max_replicas = var.max_replicas
-      min_replicas = var.min_replicas
+    max_replicas = var.max_replicas
+    min_replicas = var.min_replicas
 
-      rule {
-        name = "celery-scale"
-        type = "redis"
+    custom_scale_rule {
+      name = "celery-scale"
 
-        metadata = {
-          address       = var.redis_url
-          listName      = var.list_name
-          listLength    = var.list_length
-          databaseIndex = "0"
-        }
-
-        auth {
-          secretRef        = "redis-password"
-          triggerParameter = "password"
-        }
+      metadata = {
+        address       = var.redis_url
+        listName      = var.list_name
+        listLength    = var.list_length
+        databaseIndex = "0"
       }
+
+        authentication {
+          secret_name      = "redis-password"
+          trigger_parameter = "password"
+        }
+      custom_rule_type = "redis"
     }
   }
 
-  ingress {
-    external_enabled = false
-  }
+    secret {
+      name  = "ghcr-password"
+      value = var.registry_password
+    }
 
-  secret {
-    name  = "ghcr-password"
-    value = var.registry_password
-  }
+
 
   registry {
     server               = "ghcr.io"
