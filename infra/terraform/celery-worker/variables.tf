@@ -39,6 +39,12 @@ variable "redis_url" {
   type        = string
 }
 
+variable "redis_password" {
+  description = "Connection password for Redis (used by Celery broker)"
+  type        = string
+  sensitive   = true
+}
+
 variable "list_name" {
   description = "Redis list name Celery uses (default: 'celery')"
   type        = string

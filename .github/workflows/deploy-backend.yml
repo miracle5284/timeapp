@@ -320,10 +320,17 @@ jobs:
         run: |
           REDIS_URL=$(az keyvault secret show \
             --vault-name "${{ secrets.KEY_VAULT_NAME }}" \
-            --name "redis-url" \
+            --name "REDIS-URL" \
             --query "value" -o tsv)
 
           echo "REDIS_URL=$REDIS_URL" >> $GITHUB_ENV
+          
+          REDIS_PASSWORD=$(az keyvault secret show \
+            --vault-name "${{ secrets.KEY_VAULT_NAME }}" \
+            --name "REDIS-PASSWORD" \
+            --query "value" -o tsv)
+
+          echo "REDIS_PASSWORD=$REDIS_PASSWORD" >> $GITHUB_ENV
 
       - name: Terraform Init (Celery)
         working-directory: ./infra/terraform/celery-worker
@@ -351,6 +358,7 @@ jobs:
             -var "list_name=celery" \
             -var "list_length=1" \
             -var "redis_url=$REDIS_URL" \
+            -var "redis_password=$REDIS_PASSWORD" \
             -var "environment=${{ needs.prepare.outputs.Environment }}"
 
       - name: 🔑 Fetch and Inject Vault Secrets into Celery App

@@ -11,11 +11,11 @@ resource "azurerm_container_app" "chrona_celery_worker" {
 
   template {
     container {
-      name   = var.worker_name
-      image  = var.app_image
-      cpu    = 0.25
-      memory = "0.5Gi"
-      command = ["poetry", "run", "celery", "-A", "config", "worker", "--loglevel=info"]
+      name    = var.worker_name
+      image   = var.app_image
+      cpu     = 0.25
+      memory  = "0.5Gi"
+      command = ["celery", "-A", "config", "worker", "--loglevel=info"]
     }
 
     max_replicas = var.max_replicas
@@ -42,6 +42,11 @@ resource "azurerm_container_app" "chrona_celery_worker" {
     secret {
       name  = "ghcr-password"
       value = var.registry_password
+    }
+
+      secret {
+      name  = "redis-password"
+      value = var.redis_password
     }
 
 

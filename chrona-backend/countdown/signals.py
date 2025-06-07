@@ -90,7 +90,8 @@ def timer_status_watcher(sender, instance, created, **kwargs):
             # Save both scheduled tasks to the DB
             TaskRegistry.objects.bulk_create(scheduled_tasks)
 
-    elif prev_status == 'active' and not instance.is_active:
+    # elif prev_status == 'active' and not instance.is_active:
+    elif instance.status not in ('active', 'completed'):
         # If the timer is paused/completed/reset, revoke any existing tasks
         for task in TaskRegistry.objects.filter(
             related_model=instance.__class__.__name__,
