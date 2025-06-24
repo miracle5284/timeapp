@@ -1,3 +1,4 @@
+from django.core.validators import RegexValidator
 from django.utils import timezone
 from rest_framework import serializers
 
@@ -110,8 +111,14 @@ class TimerSerializer(TimerValidator, serializers.ModelSerializer):
     for handling specific timer lifecycle events (start, pause, reset, complete).
     """
 
-    name = serializers.CharField(required=True)
-    timestamp = serializers.DateTimeField(required=True, write_only=True)
+    name = serializers.CharField(
+        max_length=100,
+        validators=[
+            # only letters, numbers, spaces, hyphens and underscores
+            RegexValidator(r'^[\w\s-]+$', 'Name contains invalid characters.')
+        ]
+    )
+    timestamp = serializers.DateTimeField(required=True, write_only=True, allow_null=True)
     status = serializers.CharField(read_only=True)
 
     class Meta:
@@ -128,17 +135,15 @@ class TimerSerializer(TimerValidator, serializers.ModelSerializer):
         Returns:
             Timers: Newly created timer instance.
         """
-        if validated_data.get('name') is None:
-            raise serializers.ValidationError("Timer name is required.")
         timestamp = validated_data.pop('timestamp')
 
         validated_data.update({
-            'status': 'active',
-            'paused_at': None,
-            'resumed_at': timestamp,
-            'start_at': timestamp,
-            'user_id': self.context['request'].user,
-            'remaining_duration_seconds': validated_data.get('duration_seconds')
+        #     'status': 'active',
+        #     'paused_at': None,
+        #     'resumed_at': timestamp,
+        #     'start_at': timestamp,
+              'user_id': self.context['request'].user,
+        #     'remaining_duration_seconds': validated_data.get('duration_seconds')
         })
         return super().create(validated_data)
 
@@ -154,7 +159,7 @@ class TimerSerializer(TimerValidator, serializers.ModelSerializer):
         Returns:
             dict: Serialized timer data for API response.
         """
-        if instance.status != 'completed' and not instance.paused_at and instance.resumed_at:
+        if instance.status != "inactive" and not instance.paused_at and instance.resumed_at:
             elapsed = (timezone.now() - instance.resumed_at).total_seconds()
             instance.remaining_duration_seconds = max(0, instance.remaining_duration_seconds - elapsed)
 
