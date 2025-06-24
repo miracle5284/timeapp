@@ -75,7 +75,7 @@ def timer_status_watcher(sender, instance, created, **kwargs):
 
             # Schedule the push notification
             push_task = push_user_timer_complete.apply_async(
-                args=[instance.user_id.id, instance.id],
+                args=[instance.user_id.id, instance.name or instance.id],
                 eta=scheduled_time
             )
             scheduled_tasks.append(TaskRegistry(
@@ -90,8 +90,7 @@ def timer_status_watcher(sender, instance, created, **kwargs):
             # Save both scheduled tasks to the DB
             TaskRegistry.objects.bulk_create(scheduled_tasks)
 
-    # elif prev_status == 'active' and not instance.is_active:
-    elif instance.status not in ('active', 'completed'):
+    elif prev_status == 'active' and not instance.is_active:
         # If the timer is paused/completed/reset, revoke any existing tasks
         for task in TaskRegistry.objects.filter(
             related_model=instance.__class__.__name__,

@@ -38,13 +38,26 @@ if timer_static.exists():
     STATICFILES_DIRS.append(timer_static)
 
 REDIS_HOST = config('REDIS_HOST', default='localhost')
-REDIS_PORT = config('REDIS_PORT', cast=int, default=6379)
-REDIS_PASSWORD = config('REDIS_PASSWORD', '')
+REDIS_PORT = config('REDIS_PORT', default='6379')
+REDIS_PASSWORD = config('REDIS_PASSWORD', default="")
 
+CELERY_BROKER_URL = config('CELERY_BROKER_URL', default="")
 REDIS_ENDPOINT = f'rediss://default:{REDIS_PASSWORD}@{REDIS_HOST}:{REDIS_PORT}'
-CELERY_BROKER_URL = f"{REDIS_ENDPOINT}/0"
-CELERY_RESULT_BACKEND = f"{REDIS_ENDPOINT}/0?ssl_cert_reqs=CERT_NONE"
+print('CELERY;', CELERY_BROKER_URL, REDIS_ENDPOINT)
+CELERY_RESULT_BACKEND = f"{REDIS_ENDPOINT}/0"
+if not CELERY_BROKER_URL:
+    CELERY_BROKER_URL = f"redis://{REDIS_HOST}:{REDIS_PORT}/1"
+    CELERY_RESULT_BACKEND = f"redis://{REDIS_HOST}:{REDIS_PORT}/2"
 
+CELERY_REDIS_BACKEND_USE_SSL = {
+    "ssl_cert_reqs": "none"  # or "required" if you're verifying certs
+}
+
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_TIMEZONE = "UTC"
+CELERY_TASK_IGNORE_RESULT = False
 
 LOGGING = {
     'version': 1,
