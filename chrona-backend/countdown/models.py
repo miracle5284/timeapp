@@ -22,7 +22,7 @@ class Timers(Model):
     name = EncryptedCharField(max_length=255)
     duration_seconds = models.PositiveIntegerField(default=0)
     remaining_duration_seconds = models.PositiveIntegerField(default=0)
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='inactive')
     is_recurring = models.BooleanField(default=False)
     start_at = models.DateTimeField(blank=True, null=True)
     paused_at = models.DateTimeField(blank=True, null=True)

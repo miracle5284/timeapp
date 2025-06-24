@@ -1,5 +1,5 @@
 import logging
-
+from rest_framework.response import Response
 from rest_framework.decorators import action
 
 from countdown.serializers import TimerSerializer, Timers
@@ -57,3 +57,9 @@ class TimerViewSet(BaseModelViewSet):
         context = super().get_serializer_context()
         context['endpoint'] = self.request.path
         return context
+
+    @action(methods=['patch'], detail=True)
+    def rename(self, request, **kwargs):
+        data = self.partial_update(request, **kwargs)
+        return Response({"data": {"name": data.data['name']}, "message": "Timer renamed successfully."}, status=200)
+
