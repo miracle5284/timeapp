@@ -15,7 +15,8 @@ resource "azurerm_container_app" "chrona_celery_worker" {
       image   = var.app_image
       cpu     = 0.25
       memory  = "0.5Gi"
-      command = ["celery", "-A", "config", "worker", "--loglevel=info"]
+      command = ["celery", "-A", "config", "worker", "--loglevel=info" , "--without-gossip", "--without-mingle",
+        "--without-heartbeat"]
     }
 
     max_replicas = var.max_replicas
