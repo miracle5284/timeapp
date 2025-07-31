@@ -17,12 +17,12 @@ class Timers(Model):
         ('inactive', 'Inactive')
     ]
 
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     user_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='timers')
     name = EncryptedCharField(max_length=255)
     duration_seconds = models.PositiveIntegerField(default=0)
     remaining_duration_seconds = models.PositiveIntegerField(default=0)
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='inactive')
     is_recurring = models.BooleanField(default=False)
     start_at = models.DateTimeField(blank=True, null=True)
     paused_at = models.DateTimeField(blank=True, null=True)
@@ -37,6 +37,10 @@ class Timers(Model):
 
     def __str__(self):
         return f"{self.name} ({self.user_id})"
+
+    @property
+    def is_active(self):
+        return self.status == 'active'
 
 
 class NotificationSettings(Model):

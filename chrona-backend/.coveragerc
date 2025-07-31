@@ -1,0 +1,17 @@
+[run]
+omit =
+    */tests/*
+    */test_*.py
+    */migrations/*
+    conftest.py
+    manage.py
+    config/settings/dev.py
+    scripts/*
+    stopwatch/tests/*
+    timer/*
+    users/tests/*
+
+[report]
+fail_under = 69
+show_missing = True
+skip_covered = True

@@ -40,6 +40,9 @@ SECURE_REDIRECT_EXEMPT = [
 ]
 
 
+# Keys
+VAPID_KEY=config('VAPID_PRIVATE_KEY')
+
 
 # Application definition
 
@@ -56,6 +59,8 @@ INSTALLED_APPS = [
     'timer',
     'countdown',
     'users',
+    'notifications',
+    'task_registry',
     # 'stopwatch',
 
 
@@ -144,7 +149,7 @@ REST_FRAMEWORK = {
         "rest_framework.throttling.UserRateThrottle",
     ],
     "DEFAULT_THROTTLE_RATES": {
-        "user": "10/minute",
+        "user": "50/minute",
         "anon": "5/minute",
     },
 }
@@ -158,6 +163,7 @@ SIMPLE_JWT = {
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
     'UPDATE_LAST_LOGIN': True,
+    'TOKEN_BLACKLIST_ENABLED': True
 }
 INSTALLED_APPS += ['rest_framework_simplejwt.token_blacklist']
 
