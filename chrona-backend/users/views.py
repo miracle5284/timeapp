@@ -1,14 +1,18 @@
+from datetime import datetime
+
 from django.contrib.auth.password_validation import validate_password
 from django.core.mail import send_mail
 from django.urls import reverse
 from django.utils.encoding import force_bytes, force_str
+from django.utils.timezone import make_aware
 from rest_framework import status
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
 from django.utils.http import urlsafe_base64_encode
 from django.contrib.auth.tokens import default_token_generator
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.token_blacklist.models import OutstandingToken, BlacklistedToken
+from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from rest_framework_simplejwt.views import TokenObtainPairView
 
 from django.conf import settings
@@ -39,7 +43,25 @@ class LogoutUserView(BaseGenericAPIView):
             refresh_token = request.data.get('refresh')
             token = RefreshToken(refresh_token)
             token.blacklist()
+
+            # 🔒 Manually blacklist the access token
+            access_token = request.auth
+            if isinstance(access_token, AccessToken):
+                jti = access_token.get('jti')
+                exp = access_token.get('exp')
+                exp_dt = make_aware(datetime.fromtimestamp(exp))
+                raw_token = request.META.get('HTTP_AUTHORIZATION', '').replace('Bearer ', '').strip()
+                token_obj, _ = OutstandingToken.objects.get_or_create(
+                    jti=jti,
+                    defaults={
+                        'token': raw_token,
+                        'expires_at': exp_dt,
+                        'user': request.user
+                    })
+                BlacklistedToken.objects.get_or_create(token=token_obj)
+
             return Response({'detail': 'Logout successful'}, status=status.HTTP_205_RESET_CONTENT)
+
         except Exception as e:
             return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 

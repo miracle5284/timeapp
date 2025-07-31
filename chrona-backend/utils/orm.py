@@ -1,7 +1,14 @@
-from django.db import models
+from django.db import models, connection
 from .shield import compute_hmac
 from .fields import EncryptedTextField
 from django.contrib.auth.models import UserManager
+
+
+def get_raw_column_value(model, field_name, obj_id):
+    table = model._meta.db_table
+    with connection.cursor() as cursor:
+        cursor.execute(f'SELECT %s FROM %s WHERE id = %s' % (field_name, table, obj_id))
+        return cursor.fetchone()[0]
 
 
 class HMACModelBase(models.base.ModelBase):
@@ -135,6 +142,19 @@ class SmartManager(models.Manager):
     """
     def get_queryset(self):
         return SmartQueryset(self.model, using=self._db)
+
+    def create_or_update(self, defaults=None, serializer_cls=None, **kwargs):
+        instance = self.model.objects.filter(**kwargs).first()
+        data = {**kwargs, **(defaults or {})}
+        if serializer_cls:
+            serializer = serializer_cls(instance=instance, data=data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return instance is None, serializer
+        else:
+            # TODO: Handle when serializer class is not provided.
+            # return self.model.objects.create(**kwargs, **defaults)
+            pass
 
 
 class SmartUserManager(SmartManager, UserManager):
