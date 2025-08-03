@@ -1,3 +1,103 @@
+# 🚀 Chrona Backend — v3.0 Release Notes
+
+**Date:** 2025-08-04
+**Version:** v3.0 (Major Production Release)
+**Codename:** *Nimbus*
+
+---
+
+## 📌 Overview
+
+Chrona v3.0 marks a pivotal step forward in performance, responsiveness, and reliability.
+With **real-time notifications**, **automated alert handling**, and **bulletproof deployment workflows**, Nimbus brings Chrona closer to a seamless, responsive experience across platforms — while maintaining secure, scalable infrastructure under the hood.
+
+---
+
+## 🎉 What’s New
+
+### Timer Automation & Signal System
+
+* Timers now automatically:
+
+  * Trigger notifications when started or completed.
+  * Cancel alerts when paused or reset.
+* Built-in **grace period** reduces false or premature alerts.
+* Added support for **multi-event scheduling logic**.
+
+### Real-Time Notifications (Web Push)
+
+* Users receive browser alerts instantly when timers complete.
+* Notifications work even if the app is closed or in the background.
+* Subscriptions are securely stored and cleaned up when expired.
+
+### Background Task Engine
+
+* Long-running tasks (like notification sending) now run asynchronously.
+* System performance is improved during high load or multiple concurrent actions.
+
+### Testing & Quality Gates
+
+* All changes now run through automated testing pipelines before release.
+* Introduced **test coverage threshold** enforcement (minimum 69%).
+* Added tests for key apps: `countdown`, `notifications`, `users`, and `utils`.
+
+### CI/CD Pipeline Upgrades
+
+* **Secrets now injected securely** during build via Azure Key Vault.
+* Deployments gated by test success — safer releases.
+* Artifacts and coverage reports are uploaded automatically.
+* Production and staging flows are clearly separated.
+
+### Infrastructure & DevOps Enhancements
+
+* Full infrastructure managed via **Terraform**:
+
+  * Timer workers can now scale automatically based on queue load.
+  * Environment-specific variables are cleanly injected via Azure bindings.
+* Refined `celery-worker` module for better task orchestration.
+* Continued use of **Poetry** for reliable dependency management.
+
+---
+
+## 🔐 Security & Resilience
+
+* Redis connections now use **TLS (rediss\://)** for secure communication.
+* User logout now blacklists access tokens immediately.
+* Improved OAuth and session handling for multi-device safety.
+
+---
+
+## 🛑 Breaking Changes
+
+* Manual task triggers and old alert logic have been retired.
+* Legacy APIs for notifications are no longer supported.
+* Workers now require updated config values for queues and tasks.
+
+---
+
+## ✅ Validation
+
+* All tests passed with enforced thresholds.
+* Full backend deployed in staging, load-tested under typical production traffic.
+* Observability tested: Prometheus, Grafana, Sentry, and LogDNA all functional.
+* Terraform deployment validated on Azure for both backend and task worker services.
+
+---
+
+## 📈 What’s Next (v3.x Series Roadmap)
+
+* **Cross-device sync** for timer state.
+* **Analytics dashboards** for usage insights.
+* **Shared timers** — create, assign, and collaborate with others.
+* **OAuth + Magic Link** login experience.
+* **TimescaleDB** event stream for granular timer analytics.
+
+---
+
+Chrona Backend v3.0 *Nimbus* is now **real-time capable, secure by default, and deployable at scale** — laying the foundation for rich user experiences across all platforms.
+---
+---
+
 # 🚀 Chrona Backend — v2.0 Release Notes
 
 **Date:** 2025-05-12

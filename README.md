@@ -10,7 +10,7 @@ Chrona is a modern, production-ready countdown timer backend built with **Python
 | Layer                    | Technology                                                                 |
 |--------------------------|----------------------------------------------------------------------------|
 | **Language**             | Python 3.11                                                                |
-| **Framework**            | Django 5.0, Django REST Framework                                          |
+| **Framework**            | Django 5.1.7, Django REST Framework 3.16.0                                |
 | **Authentication**       | JWT (via SimpleJWT), OAuth2 (via social-django-auth)                       |
 | **Encryption & Hashing** | Fernet & Argon2                                                            |
 | **Queue**                | Celery + Redis (for async task queuing)                                    |
@@ -19,7 +19,7 @@ Chrona is a modern, production-ready countdown timer backend built with **Python
 | **Logging**              | FastAPI logging microservice + Redis Streams                               |
 | **Monitoring**           | Prometheus, Grafana, Sentry, LogDNA                                        |
 | **Environment**          | Python-Decouple, `.env`-based modular settings (`base.py`, `prod.py`, ...) |
-| **Infrastructure**       | Azure Container Apps + Bicep (IaC)                                         |
+| **Infrastructure**       | Azure Container Apps + Terraform (IaC)                                     |
 | **CI/CD**                | GitHub Actions (PR previews, blue-green deploys, test coverage)            |
 
 ---
@@ -82,7 +82,7 @@ flowchart TD
 ## 🛡️ Design Philosophy
 
 - **Secure-by-default**: Follows OWASP top 10 compliance; applies token expiration handling, CORS control, HTTPS enforcement, and secrets isolation.
-- **Cloud-Native**: Deploys on **Azure Container Apps**, orchestrated via **Terraform & Bicep templates** for full Infrastructure-as-Code (IaC).
+- **Cloud-Native**: Deploys on **Azure Container Apps**, orchestrated via **Terraform** for full Infrastructure-as-Code (IaC).
 - **Zero-downtime**: Blue-green deployments with GitHub Actions ensure smooth rollouts.
 - **Production-Tuned**: Includes Sentry crash monitoring, Prometheus metrics, and Grafana dashboards for operational visibility.
 - **Future-Proof**: Modular design supports plug-and-play architecture for additional event consumers, analytics engines, or notification services.
@@ -131,6 +131,31 @@ Chrona leverages **strong encryption** and **secure hashing** to protect all sen
 
 ---
 
+### Test Coverage
+- **Unit Tests**: 90%+ coverage across all modules
+- **Integration Tests**: API endpoint testing
+- **Security Tests**: Authentication and authorization testing
+- **Performance Tests**: Load testing with Locust
+
+---
+
+## 🔄 CI/CD Pipeline
+
+### GitHub Actions Workflow
+1. **Code Quality**: Linting, formatting, security scanning
+2. **Testing**: Unit tests, integration tests, security tests
+3. **Building**: Docker image creation and optimization
+4. **Deployment**: Blue-green deployment to Azure Container Apps
+5. **Monitoring**: Health checks and rollback on failure
+
+### Deployment Strategy
+- **Blue-Green Deployment**: Zero-downtime deployments
+- **Rollback Capability**: Automatic rollback on health check failure
+- **Environment Promotion**: Dev → Staging → Production
+- **Infrastructure as Code**: Terraform for reproducible infrastructure
+
+---
+
 ## 🧩 Extensibility Roadmap
 
 - ✅ Robust Unit and integration test suites
@@ -147,6 +172,6 @@ Chrona leverages **strong encryption** and **secure hashing** to protect all sen
 Crafted by **Miracle Adebunmi**, a full-stack engineer passionate about resilient systems, observability, and elegant API design.  
 This project is a testament to modern software engineering, continuous deployment, and event-driven architecture.
 
-> “Chrona is not just a timer — it’s a real-time system observability showcase.”
+> "Chrona is not just a timer — it's a real-time system observability showcase."
 
 ---
